@@ -34,24 +34,23 @@ class MasterCRUD extends \atk4\ui\View
         $this->crumb->addCrumb($this->getCaption($m), $this->url());
 
         $this->path = explode('/', $this->stickyGet('path'));
+        if ($this->path[0] == '') {
+            unset($this->path[0]);
+        }
 
         $defs = $this->traverseModel($this->path, $defs);
 
         $this->crumb->set($this->getCaption($m));
 
-        $arg_name = $m->table.'_id';
+        $arg_name = $this->model->table.'_id';
         $arg_val = $this->stickyGet($arg_name);
-        if ($arg_val && $m->tryLoad($arg_val)->loaded()) {
-
-
+        if ($arg_val && $this->model->tryLoad($arg_val)->loaded()) {
             $this->initTabs($defs);
         } else {
             $this->initCrud($defs);
         }
 
-
-        $pp = array_pop($this->crumb->path);
-        $this->crumb->set($pp['section']);
+        $this->crumb->popTitle();
 
         return $this->rootModel;
     }
@@ -61,14 +60,22 @@ class MasterCRUD extends \atk4\ui\View
         return isset($m->title) ? $m->title : preg_replace('|.*\\\|', '', get_class($m));
     }
 
+    function getTitle($m)
+    {
+        return $m[$m->title_field];
+    }
+
     function initTabs($defs)
     {
 
         $m = $this->model; 
 
         $this->tabs = $this->add('Tabs');
+
+        //var_Dump($this->url());
+        //var_Dump($this->tabs->url());
         $this->tabs->stickyGet($this->model->table.'_id');
-        $this->crumb->addCrumb($m[$m->title_field], $this->tabs->url());
+        $this->crumb->addCrumb($this->getTitle($m), $this->tabs->url());
 
         $form = $this->tabs->addTab('Details')->add('Form');
         $form->setModel($this->model);
@@ -83,16 +90,44 @@ class MasterCRUD extends \atk4\ui\View
 
             $this->tabs->addTab($this->getCaption($m), function($p) use($subdef, $m, $ref) {
 
-
-                $p->add(['Button', 'cickme'])->on('click', function() { return 'ouch'; });;
-                $this->sub_crud = $p->add('CRUD');
+                $this->sub_crud = $p->add($this->getCRUDSeed($subdef));
 
                 $this->sub_crud->setModel($m);
                 $t = $p->urlTrigger ?: $p->name;
-                $this->sub_crud->addDecorator($m->title_field, ['Link', [$t=>false, 'path'=>join('/',$this->path).'/'.$ref], [$m->table.'_id'=>'id']]);
+                $this->sub_crud->addDecorator($m->title_field, ['Link', [$t=>false, 'path'=>$this->getPath($ref)], [$m->table.'_id'=>'id']]);
 
             });
         }
+    }
+
+    /**
+     * Provided with a relative path, add it to the current one
+     * and return string
+     */
+    function getPath($rel) {
+        $path = $this->path;
+
+        if (!is_array($rel)) {
+            $rel = explode('/', $rel);
+        }
+
+        foreach($rel as $rel_one) {
+            if ($rel_one == '..') {
+                array_pop($path);
+                continue;
+            }
+
+            if ($rel_one == '') {
+                $path = [];
+                continue;
+            }
+
+            $path[] = $rel_one;
+        }
+
+
+        $res = join('/', $path);
+        return $res == '' ? false : $res;
     }
 
     function initCrud($defs, $p = null) {
@@ -108,10 +143,13 @@ class MasterCRUD extends \atk4\ui\View
 
     function getCRUDSeed($defs)
     {
-        $extra = isset($defs[0])? $defs[0]: [];
-        return $this->mergeSeeds($this->_missingProperty, [
-            'CRUD',
-        ], $extra);
+        $seed = isset($defs[0])? $defs[0]: [];
+        $result= $this->mergeSeeds(
+            $seed,
+            $this->_missingProperty, 
+            [ 'CRUD', ]
+        );
+        return $result;
     }
 
     /**
@@ -122,7 +160,10 @@ class MasterCRUD extends \atk4\ui\View
     {
         $m = $this->rootModel;
 
+        $path_part = [''];
+
         foreach($path as $p) {
+
 
             if (!$p) {
                 continue;
@@ -137,14 +178,26 @@ class MasterCRUD extends \atk4\ui\View
             // argument of a current model should be passed if we are traversing
             $arg_name = $m->table.'_id';
 
+
             $arg_val = $this->app->stickyGet($arg_name);
+
 
             if ($arg_val === null) {
                 throw new \atk4\ui\Exception(['Argument value is not specified', 'arg'=>$arg_name]);
             }
 
             // load record and traverse
-            $m = $m->load($arg_val)->ref($p);
+            $m->load($arg_val);
+
+            $this->crumb->addCrumb($this->getTitle($m), $this->url([
+                'path'=>$this->getPath($path_part)
+            ]));
+
+
+            $m = $m->ref($p);
+
+
+            $path_part[]=$p;
         }
 
         parent::setModel($m);

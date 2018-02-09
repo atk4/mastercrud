@@ -2,10 +2,13 @@
 include'init.php';
 
 $app->cdn['atk'] = '../public';
-$app->add([
+$mc = $app->add([
     '\atk4\mastercrud\MasterCRUD',
     'ipp'=>5,
     'quickSearch'=>['name'],
-])->setModel(new Client($app->db),
-    ['Invoices'=>[]]
+]);
+$mc->setModel(new Client($app->db),
+    ['Invoices'=>['Lines'=>['CRUD', 'canDelete'=>false], 'Allocations'=>[]], 'Payments'=>['Allocations'=>[]]]
 );
+
+

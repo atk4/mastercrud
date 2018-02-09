@@ -22,7 +22,7 @@ class Client extends \atk4\data\Model {
     function init() {
         parent::init();
 
-        $this->addField('name');
+        $this->addField('name', ['required'=>true]);
         $this->addField('address', ['type'=>'text']);
 
         $this->hasMany('Invoices', new Invoice());
@@ -42,10 +42,8 @@ class Invoice extends \atk4\data\Model {
         $this->addField('ref_no');
         $this->addField('status', ['enum'=>['draft', 'paid', 'partial']]);
 
-        /*
         $this->hasMany('Lines', new Line())
             ->addField('total', ['aggregate'=>'sum']);
-         */
 
         $this->hasMany('Allocations', new Allocation());
     }
@@ -57,6 +55,7 @@ class Line extends \atk4\data\Model {
     function init() {
         parent::init();
 
+        $this->hasOne('invoice_id', new Invoice());
         $this->addField('item');
         $this->addField('qty', ['type'=>'integer']);
         $this->addField('price', ['type'=>'money']);
@@ -87,6 +86,8 @@ class Allocation extends \atk4\data\Model {
 
     function init() {
         parent::init();
+
+        $this->addExpression('title', '\'Alloc \' || [id]');
 
         $this->hasOne('payment_id', new Payment());
         $this->hasOne('invoice_id', new Invoice());
