@@ -4,13 +4,13 @@ namespace atk4\mastercrud;
 
 class MasterCRUD extends \atk4\ui\View
 {
-    public $crumb;
+    public $crumb = null;
 
     // the top-most model
     public $rootModel;
 
-    // details
-    public $details;
+    // Tab Label for detail.
+    public $detailLabel = 'Details';
 
     public $_missingProperty = [];
 
@@ -20,7 +20,9 @@ class MasterCRUD extends \atk4\ui\View
     }
 
     function init() {
-        $this->crumb = $this->add(['BreadCrumb', 'Unspecified', 'big']);
+        if (!$this->crumb) {
+            $this->crumb = $this->add(['BreadCrumb', 'Unspecified', 'big']);
+        }
         $this->add(['ui'=>'divider']);
 
         parent::init();
@@ -40,8 +42,6 @@ class MasterCRUD extends \atk4\ui\View
 
         $defs = $this->traverseModel($this->path, $defs);
 
-        $this->crumb->set($this->getCaption($m));
-
         $arg_name = $this->model->table.'_id';
         $arg_val = $this->stickyGet($arg_name);
         if ($arg_val && $this->model->tryLoad($arg_val)->loaded()) {
@@ -57,7 +57,7 @@ class MasterCRUD extends \atk4\ui\View
 
     function getCaption($m)
     {
-        return isset($m->title) ? $m->title : preg_replace('|.*\\\|', '', get_class($m));
+        return $m->getModelCaption();
     }
 
     function getTitle($m)
@@ -75,9 +75,13 @@ class MasterCRUD extends \atk4\ui\View
         //var_Dump($this->url());
         //var_Dump($this->tabs->url());
         $this->tabs->stickyGet($this->model->table.'_id');
+
+        if ($this->getCaption($this->rootModel) !== $this->getCaption($m)) {
+            $this->crumb->addCrumb($this->getCaption($m), $this->tabs->url());
+        }
         $this->crumb->addCrumb($this->getTitle($m), $this->tabs->url());
 
-        $form = $this->tabs->addTab('Details')->add('Form');
+        $form = $this->tabs->addTab($this->detailLabel)->add('Form');
         $form->setModel($this->model);
 
         if (!$defs) {
@@ -189,6 +193,9 @@ class MasterCRUD extends \atk4\ui\View
             // load record and traverse
             $m->load($arg_val);
 
+            if ($this->getCaption($this->rootModel) !== $this->getCaption($m)) {
+                $this->crumb->addCrumb($this->getCaption($m), $this->url(['path'=>$this->getPath($path_part)]));
+            }
             $this->crumb->addCrumb($this->getTitle($m), $this->url([
                 'path'=>$this->getPath($path_part)
             ]));
