@@ -1,5 +1,7 @@
 [ATK UI](https://github.com/atk4/ui) is a UI library for building UI interfaces that has a built-in [CRUD](http://ui.agiletoolkit.org/demos/crud.php) component. It can be used to create complex admin systems, but it requires you to populate multiple pages and inter-link them together yourself. 
 
+![mastercrud](docs/images/mastercrud.png)
+
 **MasterCRUD** is an add-on for ATK UI and ATK Data, which will orchestrate navigation between multiple CRUD pages by respecting relations and conditions. You can use **MasterCRUD** to:
 
 -   Manage list of clients, and their individual invoices and payments.
