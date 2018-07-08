@@ -76,9 +76,6 @@ class MasterCRUD extends \atk4\ui\View
         //var_Dump($this->tabs->url());
         $this->tabs->stickyGet($this->model->table.'_id');
 
-        if ($this->getCaption($this->rootModel) !== $this->getCaption($m)) {
-            $this->crumb->addCrumb($this->getCaption($m), $this->tabs->url());
-        }
         $this->crumb->addCrumb($this->getTitle($m), $this->tabs->url());
 
         $form = $this->tabs->addTab($this->detailLabel)->add('Form');
@@ -90,12 +87,14 @@ class MasterCRUD extends \atk4\ui\View
 
 
         foreach($defs as $ref=>$subdef) {
-            if (is_numeric($ref) || $ref == 'menuActions') {
+            if (is_numeric($ref) || $ref == 'menuActions' || $ref == 'caption') {
                 continue;
             }
             $m = $this->model->ref($ref);
 
-            $this->tabs->addTab($this->getCaption($m), function($p) use($subdef, $m, $ref) {
+            $caption = $ref; // $this->getCaption($m);
+
+            $this->tabs->addTab($caption, function($p) use($subdef, $m, $ref) {
 
                 $this->sub_crud = $p->add($this->getCRUDSeed($subdef));
 
@@ -225,9 +224,6 @@ class MasterCRUD extends \atk4\ui\View
             // load record and traverse
             $m->load($arg_val);
 
-            if ($this->getCaption($this->rootModel) !== $this->getCaption($m)) {
-                $this->crumb->addCrumb($this->getCaption($m), $this->url(['path'=>$this->getPath($path_part)]));
-            }
             $this->crumb->addCrumb($this->getTitle($m), $this->url([
                 'path'=>$this->getPath($path_part)
             ]));
