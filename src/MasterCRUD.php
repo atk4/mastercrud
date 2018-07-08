@@ -90,6 +90,9 @@ class MasterCRUD extends \atk4\ui\View
 
 
         foreach($defs as $ref=>$subdef) {
+            if (is_numeric($ref) || $ref == 'menuActions') {
+                continue;
+            }
             $m = $this->model->ref($ref);
 
             $this->tabs->addTab($this->getCaption($m), function($p) use($subdef, $m, $ref) {
@@ -142,6 +145,35 @@ class MasterCRUD extends \atk4\ui\View
         $this->crud = $p->add($this->getCRUDSeed($defs));
         $this->crud->setModel($this->model);
         $this->crud->addDecorator($this->model->title_field, ['Link', [], [$this->model->table.'_id'=>'id']]);
+
+        if ($ma = $defs['menuActions'] ?? null) {
+
+            is_array($ma) || $ma = [$ma];
+
+            foreach($ma as $key => $action) {
+                if (is_numeric($key)) {
+                    $key = $action;
+                }
+
+                if (is_callable($action)) {
+                    $this->crud->menu->addItem($key)->on(
+                        'click', 
+                        new \atk4\ui\jsModal('Executing '.$key, $this->add('VirtualPage')->set(function($p) use($key, $action) { 
+                            $action($p, $this->model, $key);
+                        }))
+                    );
+                }
+            }
+
+
+        }
+
+        /*
+        $named_args = array_filter($defs, function($k) {
+            return !is_numeric($k);
+        },  ARRAY_FILTER_USE_KEY);
+
+         */
 
     }
 
