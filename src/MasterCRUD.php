@@ -182,7 +182,7 @@ class MasterCRUD extends \atk4\ui\View
                     );
                 }
 
-                if (is_callable($action)) {
+                if ($action instanceof Closure) {
                     $crud->menu->addItem($key)->on(
                         'click', 
                         new \atk4\ui\jsModal('Executing '.$key, $this->add('VirtualPage')->set(function($p) use($key, $action) { 
@@ -222,7 +222,7 @@ class MasterCRUD extends \atk4\ui\View
                     });
                 };
 
-                if (is_callable($action)) {
+                if ($action instanceof Closure) {
                     $crud->addModalAction($key, $key, function($p, $id) use($action, $crud) {
                         call_user_func($action, $p, $crud->model->load($id));
                     });

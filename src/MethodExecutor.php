@@ -42,6 +42,7 @@ class MethodExecutor extends \atk4\ui\View
         parent::init();
 
         $this->console = $this->add(['Console', 'event'=>false]);//->addStyle('display', 'none');
+        $this->console->addStyle('max-height', '50em')->addStyle('overflow', 'scroll');
 
         $this->form = $this->add('Form');
 
