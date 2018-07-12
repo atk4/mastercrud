@@ -76,9 +76,6 @@ class MasterCRUD extends \atk4\ui\View
         //var_Dump($this->tabs->url());
         $this->tabs->stickyGet($this->model->table.'_id');
 
-        if ($this->getCaption($this->rootModel) !== $this->getCaption($m)) {
-            $this->crumb->addCrumb($this->getCaption($m), $this->tabs->url());
-        }
         $this->crumb->addCrumb($this->getTitle($m), $this->tabs->url());
 
         $form = $this->tabs->addTab($this->detailLabel)->add('Form');
@@ -90,18 +87,22 @@ class MasterCRUD extends \atk4\ui\View
 
 
         foreach($defs as $ref=>$subdef) {
-            if (is_numeric($ref) || $ref == 'menuActions') {
+            if (is_numeric($ref) || $ref == 'menuActions' || $ref == 'caption' || $ref == 'columnActions') {
                 continue;
             }
             $m = $this->model->ref($ref);
 
-            $this->tabs->addTab($this->getCaption($m), function($p) use($subdef, $m, $ref) {
+            $caption = $ref; // $this->getCaption($m);
+
+            $this->tabs->addTab($caption, function($p) use($subdef, $m, $ref) {
 
                 $this->sub_crud = $p->add($this->getCRUDSeed($subdef));
 
                 $this->sub_crud->setModel($m);
                 $t = $p->urlTrigger ?: $p->name;
                 $this->sub_crud->addDecorator($m->title_field, ['Link', [$t=>false, 'path'=>$this->getPath($ref)], [$m->table.'_id'=>'id']]);
+
+                $this->addActions($this->sub_crud, $subdef);
 
             });
         }
@@ -146,27 +147,8 @@ class MasterCRUD extends \atk4\ui\View
         $this->crud->setModel($this->model);
         $this->crud->addDecorator($this->model->title_field, ['Link', [], [$this->model->table.'_id'=>'id']]);
 
-        if ($ma = $defs['menuActions'] ?? null) {
+        $this->addActions($this->crud, $defs);
 
-            is_array($ma) || $ma = [$ma];
-
-            foreach($ma as $key => $action) {
-                if (is_numeric($key)) {
-                    $key = $action;
-                }
-
-                if (is_callable($action)) {
-                    $this->crud->menu->addItem($key)->on(
-                        'click', 
-                        new \atk4\ui\jsModal('Executing '.$key, $this->add('VirtualPage')->set(function($p) use($key, $action) { 
-                            $action($p, $this->model, $key);
-                        }))
-                    );
-                }
-            }
-
-
-        }
 
         /*
         $named_args = array_filter($defs, function($k) {
@@ -175,6 +157,78 @@ class MasterCRUD extends \atk4\ui\View
 
          */
 
+    }
+
+    function addActions($crud, $defs)
+    {
+        if ($ma = $defs['menuActions'] ?? null) {
+            
+
+            is_array($ma) || $ma = [$ma];
+
+            foreach($ma as $key => $action) {
+                if (is_numeric($key)) {
+                    $key = $action;
+                }
+
+                if (is_string($action)) {
+                    $crud->menu->addItem($key)->on(
+                        'click', 
+                        new \atk4\ui\jsModal('Executing '.$key, $this->add('VirtualPage')->set(function($p) use($key, $action) { 
+
+                            // TODO: this does ont work within a tab :(
+                            $p->add(new MethodExecutor($crud->model, $key));
+                        }))
+                    );
+                }
+
+                if ($action instanceof Closure) {
+                    $crud->menu->addItem($key)->on(
+                        'click', 
+                        new \atk4\ui\jsModal('Executing '.$key, $this->add('VirtualPage')->set(function($p) use($key, $action) { 
+                            $action($p, $this->model, $key);
+                        }))
+                    );
+                }
+            }
+        }
+
+        if ($ca = $defs['columnActions'] ?? null) {
+
+            is_array($ca) || $ca = [$ca];
+
+            foreach($ca as $key => $action) {
+                if (is_numeric($key)) {
+                    $key = $action;
+                }
+
+                if (is_string($action)) {
+                    $crud->addModalAction(['icon'=>$action], $key, function($p, $id) use($action, $key, $crud) {
+                        $p->add(new MethodExecutor($crud->model->load($id), $key));
+                    });
+                }
+
+                if (is_array($action)) {
+
+                    $label = $key;
+
+                    if (isset($action['icon'])) {
+                        $label = ['icon'=>$action['icon']];
+                        unset($action['icon']);
+                    }
+
+                    $crud->addModalAction($label, $key, function($p, $id) use($action, $key, $crud) {
+                        $p->add(new MethodExecutor($crud->model->load($id), $key, $action));
+                    });
+                };
+
+                if ($action instanceof Closure) {
+                    $crud->addModalAction($key, $key, function($p, $id) use($action, $crud) {
+                        call_user_func($action, $p, $crud->model->load($id));
+                    });
+                }
+            }
+        }
     }
 
     function getCRUDSeed($defs)
@@ -225,9 +279,6 @@ class MasterCRUD extends \atk4\ui\View
             // load record and traverse
             $m->load($arg_val);
 
-            if ($this->getCaption($this->rootModel) !== $this->getCaption($m)) {
-                $this->crumb->addCrumb($this->getCaption($m), $this->url(['path'=>$this->getPath($path_part)]));
-            }
             $this->crumb->addCrumb($this->getTitle($m), $this->url([
                 'path'=>$this->getPath($path_part)
             ]));
