@@ -1,13 +1,12 @@
 <?php
 namespace atk4\mastercrud;
 
-
 /**
  * This component will display a form and a console. After filling out the form, the values
  * will be passed on to the model / method of your choice and the execution of that method
  * will be displayed in the console.
  *
- * $app->add(new MethodExecutior($user, 'generatePassword', ['integer']));
+ * $app->add(new MethodExecutor($user, 'generatePassword', ['integer']));
  *
  * Possible values of 3rd argument would be:
  *
@@ -20,15 +19,16 @@ class MethodExecutor extends \atk4\ui\View
 {
     use \atk4\core\SessionTrait;
 
+    /** @var \atk4\data\Model */
     public $model = null;
 
+    /** @var string */
     public $method = null;
 
-    public $arguments = null;
-
+    /** @var array */
     public $defs = null;
 
-    function __construct(\atk4\data\Model $model, $method, $defs = [])
+    public function __construct(\atk4\data\Model $model, $method, $defs = [])
     {
         parent::__construct([
             'model'=>$model,
@@ -38,7 +38,7 @@ class MethodExecutor extends \atk4\ui\View
     }
 
 
-    function init() {
+    public function init() {
         parent::init();
 
         $this->console = $this->add(['Console', 'event'=>false]);//->addStyle('display', 'none');
@@ -90,9 +90,7 @@ class MethodExecutor extends \atk4\ui\View
                 $args[] = $val;
             }
 
-
             $c->setModel($this->model, $this->method, $args);
         });
     }
-
 }
