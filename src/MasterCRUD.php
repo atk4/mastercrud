@@ -67,13 +67,10 @@ class MasterCRUD extends \atk4\ui\View
 
     function initTabs($defs)
     {
-
-        $m = $this->model; 
+        $m = $this->model;
 
         $this->tabs = $this->add('Tabs');
 
-        //var_Dump($this->url());
-        //var_Dump($this->tabs->url());
         $this->tabs->stickyGet($this->model->table.'_id');
 
         $this->crumb->addCrumb($this->getTitle($m), $this->tabs->url());
@@ -159,10 +156,9 @@ class MasterCRUD extends \atk4\ui\View
 
     }
 
-    function addActions($crud, $defs)
+    public function addActions($crud, $defs)
     {
         if ($ma = $defs['menuActions'] ?? null) {
-            
 
             is_array($ma) || $ma = [$ma];
 
@@ -173,8 +169,8 @@ class MasterCRUD extends \atk4\ui\View
 
                 if (is_string($action)) {
                     $crud->menu->addItem($key)->on(
-                        'click', 
-                        new \atk4\ui\jsModal('Executing '.$key, $this->add('VirtualPage')->set(function($p) use($key, $action) { 
+                        'click',
+                        new \atk4\ui\jsModal('Executing '.$key, $this->add('VirtualPage')->set(function($p) use($key, $action) {
 
                             // TODO: this does ont work within a tab :(
                             $p->add(new MethodExecutor($crud->model, $key));
@@ -182,10 +178,10 @@ class MasterCRUD extends \atk4\ui\View
                     );
                 }
 
-                if ($action instanceof Closure) {
+                if ($action instanceof \Closure) {
                     $crud->menu->addItem($key)->on(
-                        'click', 
-                        new \atk4\ui\jsModal('Executing '.$key, $this->add('VirtualPage')->set(function($p) use($key, $action) { 
+                        'click',
+                        new \atk4\ui\jsModal('Executing '.$key, $this->add('VirtualPage')->set(function($p) use($key, $action) {
                             $action($p, $this->model, $key);
                         }))
                     );
@@ -198,33 +194,29 @@ class MasterCRUD extends \atk4\ui\View
             is_array($ca) || $ca = [$ca];
 
             foreach($ca as $key => $action) {
+
                 if (is_numeric($key)) {
                     $key = $action;
                 }
 
                 if (is_string($action)) {
-                    $crud->addModalAction(['icon'=>$action], $key, function($p, $id) use($action, $key, $crud) {
-                        $p->add(new MethodExecutor($crud->model->load($id), $key));
-                    });
+                    $label = ['icon'=>$action];
                 }
 
-                if (is_array($action)) {
+                is_array($action) || $action = [$action];
 
-                    $label = $key;
+                if (isset($action['icon'])) {
+                    $label = ['icon'=>$action['icon']];
+                    unset($action['icon']);
+                }
 
-                    if (isset($action['icon'])) {
-                        $label = ['icon'=>$action['icon']];
-                        unset($action['icon']);
-                    }
-
-                    $crud->addModalAction($label, $key, function($p, $id) use($action, $key, $crud) {
-                        $p->add(new MethodExecutor($crud->model->load($id), $key, $action));
+                if (isset($action[0]) && $action[0] instanceof \Closure) {
+                    $crud->addModalAction($label ?: $key, $key, function($p, $id) use($action, $key, $crud) {
+                        call_user_func($action[0], $p, $crud->model->load($id));
                     });
-                };
-
-                if ($action instanceof Closure) {
-                    $crud->addModalAction($key, $key, function($p, $id) use($action, $crud) {
-                        call_user_func($action, $p, $crud->model->load($id));
+                } else {
+                    $crud->addModalAction($label ?: $key, $key, function($p, $id) use($action, $key, $crud) {
+                        $p->add(new MethodExecutor($crud->model->load($id), $key, $action));
                     });
                 }
             }
@@ -236,14 +228,14 @@ class MasterCRUD extends \atk4\ui\View
         $seed = isset($defs[0])? $defs[0]: [];
         $result= $this->mergeSeeds(
             $seed,
-            $this->_missingProperty, 
+            $this->_missingProperty,
             [ 'CRUD', ]
         );
         return $result;
     }
 
     /**
-     * Given a path and arguments, find and load the right 
+     * Given a path and arguments, find and load the right
      * model
      */
     public function traverseModel($path, $defs)
