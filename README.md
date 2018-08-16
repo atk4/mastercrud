@@ -19,6 +19,28 @@ The syntax of **MasterCRUD** is incredibly simple and short. It automatically ta
 
 ### Example Use Case (see demos/clients.php for full demo):
 
+Assuming you have Clients with Invoices and Payments and you also want to add "Line"s for each Invoice, you may want to add this interface for the admin, where user can use drill-downs to navigate through data:
+
+![step1](docs/images/step1.png)
+
+Clicking on `Client 2` would bring you to a different page. Extra tabs Invoices and Payments offer you further way in:
+
+![step2](docs/images/step2.png)
+
+clicking on specific invoice, you can edit it's lines:
+
+![step3](docs/images/step3.png)
+
+On this screen however we turned off deletion of lines (because it is a demo). However clicking Edit brings up a Modal where you can easily update record data:
+
+![step4](docs/images/step4.png)
+
+
+
+All this UI can be created in just a few lines of code!
+
+
+
 MasterCRUD operates like a regular CRUD, and you can easily substitute it in:
 
 ``` php
@@ -47,7 +69,7 @@ $crud = $app->add('\atk4\mastercrud\MasterCRUD');
 $crud->setModel('Client', ['Invoices'=>['Lines'=>[]], 'Payments'=>[]]);
 ```
 
-So far I've shown you examples of "hasMany" relations, but it's possible to also traverse "hasOne". I am going to clean up the above example into this:
+With some cleanup, this syntax is readable and nice:
 
 ``` php
 $crud = $app->add('\atk4\mastercrud\MasterCRUD');
@@ -58,6 +80,86 @@ $crud->setModel('Client', [
   'Payments'=>[]
 ]);
 ```
+
+## Support for actions
+
+MasterCRUD is awesome for quickly creating admin systems. But basic C,R,U,D operations are not enough. Sometimes you want to invoke custom actions for individual element. MasterCRUD now supports that too:
+
+```php
+$app->layout->add(new \atk4\mastercrud\MasterCRUD())
+    ->setModel(new \saasty\Model\App($app->db), 
+    [
+        'columnActions'=>[
+            'repair'=>'wrench',
+        ],
+        'Models'=>[
+            'columnActions'=>[
+                'migrate'=>'database',
+            ],
+            'Fields'=>[
+                'ValidationRules'=>[],
+            
+            ],
+            'Relations'=>[
+                'ImportedFields'=>[],
+            ],
+        ],
+```
+
+ ![actions](docs/images/actions.png)
+
+There are various invocation methods allowing you to specify icon, label, custom callbacks etc.
+
+This also adds "MethodInvocator" - a view which asks you for arguments and then executes them.
+
+This next example will use form to ask for an email, which will then be passed as argument to sendEmail($email)
+
+```php
+[
+    'columnActions'=>[
+         'sendEmail' => ['icon'=>'wrench', 'email'=>'string']
+   ]
+]
+```
+
+
+
+
+
+### Installation
+
+Install through composer: 
+
+``` bash
+ composer require atk4/mastercrud
+```
+
+Also see introduction for [ATK UI](https://github.com/atk4/ui) on how to render HTML.
+
+## Roadmap
+
+- [x] Allow to specify custom CRUD seed. You can ever replace it with your own compatible view.
+- [x] Add custom actions and function invocation
+- [ ] Create decent "View" mode (relies on ATK UI Card)
+- [ ] Traverse hasOne references (see below)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-------------------------
+
+> NOT IMPLEMENTED BELOW
 
 Suppose that `Invoice hasMany(Allocation)`and `Payment hasMany(Allocation)` while allocation can have one Payment and one Invoice.
 
@@ -94,9 +196,5 @@ $crud->setModel('Client', [
 ```
 
 Now you will be able to jump from `Invoice->allocation` to `Payment` and other way around.
-
-### Installation
-
-Install through composer (`composer require atk4/mastercrud`).
 
 
