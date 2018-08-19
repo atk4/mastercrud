@@ -90,11 +90,11 @@ $app->layout->add(new \atk4\mastercrud\MasterCRUD())
     ->setModel(new \saasty\Model\App($app->db), 
     [
         'columnActions'=>[
-            'repair'=>'wrench',
+            'repair'=>['icon'=>'wrench'],
         ],
         'Models'=>[
             'columnActions'=>[
-                'migrate'=>'database',
+                'migrate'=>['icon'=>'database'],
             ],
             'Fields'=>[
                 'ValidationRules'=>[],
