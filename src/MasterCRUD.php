@@ -4,22 +4,43 @@ namespace atk4\mastercrud;
 
 class MasterCRUD extends \atk4\ui\View
 {
+    /** @var BreadCrumb object */
     public $crumb = null;
 
-    // the top-most model
+    /** @var \atk4\data\Model the top-most model */
     public $rootModel;
 
-    // Tab Label for detail.
+    /** @var string Tab Label for detail */
     public $detailLabel = 'Details';
 
-    public $_missingProperty = [];
+   /** @var array of properties which are reserved for MasterCRUD and can't be used as model names */
+    protected $reserved_properties = ['_crud', '_tabs', 'menuActions', 'caption', 'columnActions'];
 
+    /**
+     * @obsolete Use $defs['_crud'] instead.
+     *
+     * @var array of properties which we should pass to CRUD view
+     */
+    protected $_missingProperty = [];
 
-    function setMissingProperty($property, $value) {
+    /**
+     * Sets properties which we should pass to CRUD view.
+     * Thisis automatically executed for any not-existant MasterCRUD property.
+     *
+     * @param string|array $property
+     * @param mixed        $value
+     *
+     * @obsolete Use $defs['_crud'] instead.
+     */
+    public function setMissingProperty($property, $value = null) {
         $this->_missingProperty[$property] = $value;
     }
 
-    function init() {
+    /**
+     * Initialization.
+     */
+    public function init() {
+        // add BreadCrumb view
         if (!$this->crumb) {
             $this->crumb = $this->add(['BreadCrumb', 'Unspecified', 'big']);
         }
@@ -28,13 +49,24 @@ class MasterCRUD extends \atk4\ui\View
         parent::init();
     }
 
+    /**
+     * Sets model.
+     *
+     * Use $defs['_crud'] to set seed properties for CRUD view.
+     * Use $defs['_tabs'] to set seed properties for Tabs view.
+     *
+     * @param \atk4\data\Model $m
+     * @param array            $defs
+     *
+     * @return \atk4\data\Model
+     */
     public function setModel(\atk4\data\Model $m, $defs = null)
     {
-
         $this->rootModel = $m;
 
         $this->crumb->addCrumb($this->getCaption($m), $this->url());
 
+        // extract path
         $this->path = explode('/', $this->stickyGet('path'));
         if ($this->path[0] == '') {
             unset($this->path[0]);
@@ -45,8 +77,10 @@ class MasterCRUD extends \atk4\ui\View
         $arg_name = $this->model->table.'_id';
         $arg_val = $this->stickyGet($arg_name);
         if ($arg_val && $this->model->tryLoad($arg_val)->loaded()) {
+            // initialize Tabs
             $this->initTabs($defs);
         } else {
+            // initialize CRUD
             $this->initCrud($defs);
         }
 
@@ -55,36 +89,58 @@ class MasterCRUD extends \atk4\ui\View
         return $this->rootModel;
     }
 
-    function getCaption($m)
+    /**
+     * Return model caption.
+     *
+     * @param \atk4\data\Model $m
+     *
+     * @return string
+     */
+    public function getCaption($m)
     {
         return $m->getModelCaption();
     }
 
-    function getTitle($m)
+    /**
+     * Return title field value.
+     *
+     * @param \atk4\data\Model
+     *
+     * @return string
+     */
+    public function getTitle($m)
     {
-        return $m[$m->title_field];
+        return $m->getTitle();
     }
 
-    function initTabs($defs)
+    /**
+     * Initialize tabs.
+     *
+     * @param array $defs
+     * @param \atk4\ui\View $view Parent view
+     */
+    public function initTabs($defs, $view = null)
     {
-        $m = $this->model;
+        if ($view === null) {
+            $view = $this;
+        }
 
-        $this->tabs = $this->add('Tabs');
-
+        $this->tabs = $view->add($this->getTabsSeed($defs));
         $this->tabs->stickyGet($this->model->table.'_id');
 
-        $this->crumb->addCrumb($this->getTitle($m), $this->tabs->url());
+        $this->crumb->addCrumb($this->getTitle($this->model), $this->tabs->url());
 
-        $form = $this->tabs->addTab($this->detailLabel)->add('Form');
+        // Imants: BUG HERE - WE DON'T RESPECT PROPERTIES SET IN DEFS. FOR EXAMPLE $defs[_crud]=>['fieldsDefault'=>[only,these,fields]]
+        // Should take some ideas from CRUD->initCreate and CRUD->initUpdate how to limit fields for this form.
         $form->setModel($this->model);
+        $form = $this->tabs->addTab($this->detailLabel)->add('Form');
 
         if (!$defs) {
             return;
         }
 
-
-        foreach($defs as $ref=>$subdef) {
-            if (is_numeric($ref) || $ref == 'menuActions' || $ref == 'caption' || $ref == 'columnActions') {
+        foreach ($defs as $ref => $subdef) {
+            if (is_numeric($ref) || in_array($ref, $this->reserved_properties)) {
                 continue;
             }
             $m = $this->model->ref($ref);
@@ -97,19 +153,26 @@ class MasterCRUD extends \atk4\ui\View
 
                 $this->sub_crud->setModel($m);
                 $t = $p->urlTrigger ?: $p->name;
-                $this->sub_crud->addDecorator($m->title_field, ['Link', [$t=>false, 'path'=>$this->getPath($ref)], [$m->table.'_id'=>'id']]);
+
+                if (isset($this->sub_crud->table->columns[$m->model->title_field])) {
+                    $this->sub_crud->addDecorator($m->title_field, ['Link', [$t=>false, 'path'=>$this->getPath($ref)], [$m->table.'_id'=>'id']]);
+                }
 
                 $this->addActions($this->sub_crud, $subdef);
-
             });
         }
     }
 
     /**
      * Provided with a relative path, add it to the current one
-     * and return string
+     * and return string.
+     *
+     * @param string|array $rel
+     *
+     * @return false|string
      */
-    function getPath($rel) {
+    public function getPath($rel)
+    {
         $path = $this->path;
 
         if (!is_array($rel)) {
@@ -130,32 +193,45 @@ class MasterCRUD extends \atk4\ui\View
             $path[] = $rel_one;
         }
 
-
         $res = join('/', $path);
+        
         return $res == '' ? false : $res;
     }
 
-    function initCrud($defs, $p = null) {
-        if ($p === null) {
-            $p = $this;
+    /**
+     * Initialize CRUD.
+     *
+     * @param array         $defs
+     * @param \atk4\ui\View $view Parent view
+     */
+    public function initCrud($defs, $view = null)
+    {
+        if ($view === null) {
+            $view = $this;
         }
 
-        $this->crud = $p->add($this->getCRUDSeed($defs));
+        $this->crud = $view->add($this->getCRUDSeed($defs));
         $this->crud->setModel($this->model);
-        $this->crud->addDecorator($this->model->title_field, ['Link', [], [$this->model->table.'_id'=>'id']]);
+        
+        if (isset($this->crud->table->columns[$this->model->title_field])) {
+            $this->crud->addDecorator($this->model->title_field, ['Link', [], [$this->model->table.'_id'=>'id']]);
+        }
 
         $this->addActions($this->crud, $defs);
-
 
         /*
         $named_args = array_filter($defs, function($k) {
             return !is_numeric($k);
         },  ARRAY_FILTER_USE_KEY);
-
-         */
-
+        */
     }
 
+    /**
+     * Adds CRUD action buttons.
+     *
+     * @param \atk4\ui\CRUD $crud
+     * @param array         $defs
+     */
     public function addActions($crud, $defs)
     {
         if ($ma = $defs['menuActions'] ?? null) {
@@ -223,20 +299,51 @@ class MasterCRUD extends \atk4\ui\View
         }
     }
 
-    function getCRUDSeed($defs)
+    /**
+     * Return seed for CRUD.
+     *
+     * @param array $defs
+     *
+     * @return array
+     */
+    protected function getCRUDSeed($defs)
     {
-        $seed = isset($defs[0])? $defs[0]: [];
+        $seed = isset($defs[0]) ? $defs[0] : [];
         $result= $this->mergeSeeds(
             $seed,
-            $this->_missingProperty,
+            array_merge($this->_missingProperty, isset($defs['_crud']) ? $defs['_crud'] : []),
             [ 'CRUD', ]
         );
+
         return $result;
     }
 
     /**
-     * Given a path and arguments, find and load the right
-     * model
+     * Return seed for Tabs.
+     *
+     * @param array $defs
+     *
+     * @return array
+     */
+    protected function getTabsSeed($defs)
+    {
+        $seed = isset($defs[0]) ? $defs[0] : [];
+        $result= $this->mergeSeeds(
+            $seed,
+            isset($defs['_tabs']) ? $defs['_tabs'] : [],
+            [ 'Tabs', ]
+        );
+
+        return $result;
+    }
+
+    /**
+     * Given a path and arguments, find and load the right model.
+     *
+     * @param array $path
+     * @param array $defs
+     *
+     * @return array
      */
     public function traverseModel($path, $defs)
     {
@@ -245,7 +352,6 @@ class MasterCRUD extends \atk4\ui\View
         $path_part = [''];
 
         foreach($path as $p) {
-
 
             if (!$p) {
                 continue;
@@ -259,10 +365,7 @@ class MasterCRUD extends \atk4\ui\View
 
             // argument of a current model should be passed if we are traversing
             $arg_name = $m->table.'_id';
-
-
             $arg_val = $this->app->stickyGet($arg_name);
-
 
             if ($arg_val === null) {
                 throw new \atk4\ui\Exception(['Argument value is not specified', 'arg'=>$arg_name]);
@@ -275,10 +378,7 @@ class MasterCRUD extends \atk4\ui\View
                 'path'=>$this->getPath($path_part)
             ]));
 
-
             $m = $m->ref($p);
-
-
             $path_part[]=$p;
         }
 
