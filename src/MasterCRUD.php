@@ -132,8 +132,8 @@ class MasterCRUD extends \atk4\ui\View
 
         // Imants: BUG HERE - WE DON'T RESPECT PROPERTIES SET IN DEFS. FOR EXAMPLE $defs[_crud]=>['fieldsDefault'=>[only,these,fields]]
         // Should take some ideas from CRUD->initCreate and CRUD->initUpdate how to limit fields for this form.
-        $form->setModel($this->model);
         $form = $this->tabs->addTab($this->detailLabel)->add('Form');
+        $form->setModel($this->model);
 
         if (!$defs) {
             return;
