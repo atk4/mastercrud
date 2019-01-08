@@ -28,17 +28,27 @@ class MethodExecutor extends \atk4\ui\View
     /** @var array */
     public $defs = null;
 
+    /**
+     * Constructor.
+     *
+     * @param \atk4\data\Model $model
+     * @param string           $method
+     * @param array            $defs
+     */
     public function __construct(\atk4\data\Model $model, $method, $defs = [])
     {
         parent::__construct([
-            'model'=>$model,
-            'method'=>$method,
-            'defs'=>$defs
+            'model' => $model,
+            'method' => $method,
+            'defs' => $defs
         ]);
     }
 
-
-    public function init() {
+    /**
+     * Initialization.
+     */
+    public function init()
+    {
         parent::init();
 
         $this->console = $this->add(['Console', 'event'=>false]);//->addStyle('display', 'none');

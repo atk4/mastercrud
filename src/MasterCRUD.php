@@ -17,26 +17,6 @@ class MasterCRUD extends \atk4\ui\View
     protected $reserved_properties = ['_crud', '_tabs', 'menuActions', 'caption', 'columnActions'];
 
     /**
-     * @obsolete Use $defs['_crud'] instead.
-     *
-     * @var array of properties which we should pass to CRUD view
-     */
-    protected $_missingProperty = [];
-
-    /**
-     * Sets properties which we should pass to CRUD view.
-     * Thisis automatically executed for any not-existant MasterCRUD property.
-     *
-     * @param string|array $property
-     * @param mixed        $value
-     *
-     * @obsolete Use $defs['_crud'] instead.
-     */
-    public function setMissingProperty($property, $value = null) {
-        $this->_missingProperty[$property] = $value;
-    }
-
-    /**
      * Initialization.
      */
     public function init() {
@@ -194,7 +174,7 @@ class MasterCRUD extends \atk4\ui\View
         }
 
         $res = join('/', $path);
-        
+
         return $res == '' ? false : $res;
     }
 
@@ -212,7 +192,7 @@ class MasterCRUD extends \atk4\ui\View
 
         $this->crud = $view->add($this->getCRUDSeed($defs));
         $this->crud->setModel($this->model);
-        
+
         if (isset($this->crud->table->columns[$this->model->title_field])) {
             $this->crud->addDecorator($this->model->title_field, ['Link', [], [$this->model->table.'_id'=>'id']]);
         }
@@ -311,7 +291,7 @@ class MasterCRUD extends \atk4\ui\View
         $seed = isset($defs[0]) ? $defs[0] : [];
         $result= $this->mergeSeeds(
             $seed,
-            array_merge($this->_missingProperty, isset($defs['_crud']) ? $defs['_crud'] : []),
+            isset($defs['_crud']) ? $defs['_crud'] : [],
             [ 'CRUD', ]
         );
 
