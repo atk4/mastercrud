@@ -19,7 +19,8 @@ class MasterCRUD extends \atk4\ui\View
     /**
      * Initialization.
      */
-    public function init() {
+    public function init()
+    {
         // add BreadCrumb view
         if (!$this->crumb) {
             $this->crumb = $this->add(['BreadCrumb', 'Unspecified', 'big']);
