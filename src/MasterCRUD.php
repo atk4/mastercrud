@@ -133,10 +133,10 @@ class MasterCRUD extends \atk4\ui\View
 
                 $this->sub_crud = $p->add($this->getCRUDSeed($subdef));
 
-                $this->sub_crud->setModel($m);
+                $this->sub_crud->setModel(clone $m);
                 $t = $p->urlTrigger ?: $p->name;
 
-                if (isset($this->sub_crud->table->columns[$m->model->title_field])) {
+                if (isset($this->sub_crud->table->columns[$m->title_field])) {
                     $this->sub_crud->addDecorator($m->title_field, ['Link', [$t=>false, 'path'=>$this->getPath($ref)], [$m->table.'_id'=>'id']]);
                 }
 
