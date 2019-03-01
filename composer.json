@@ -26,5 +26,8 @@
         "psr-4": {
           "atk4\\mastercrud\\tests\\":"tests/"
         }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "<6"
     }
 }
