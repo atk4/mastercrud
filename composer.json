@@ -15,8 +15,7 @@
         }
     ],
     "require": {
-        "atk4/ui": "^1.6.1",
-        "atk4/data": "^1.3.7",
+        "atk4/ui": "dev-develop",
         "php": ">=7.0.0"
     },
     "autoload": {
