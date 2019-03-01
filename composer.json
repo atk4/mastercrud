@@ -15,8 +15,8 @@
         }
     ],
     "require": {
-        "atk4/ui": "dev-develop",
-        "php": ">=7.0.0"
+        "php": ">=7.0.0",
+        "atk4/ui": "^1.6"
     },
     "autoload": {
         "psr-4": {"atk4\\mastercrud\\":"src/"}
