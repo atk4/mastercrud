@@ -332,7 +332,7 @@ class MasterCRUD extends \atk4\ui\View
         $result= $this->mergeSeeds(
             $seed,
             isset($defs['_card']) ? $defs['_card'] : [],
-            [ 'Card', ]
+            [ 'CardTable', ]
         );
 
         return $result;
