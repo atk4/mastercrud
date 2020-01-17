@@ -2,6 +2,8 @@
 
 namespace atk4\mastercrud;
 
+use atk4\ui\View;
+
 class MasterCRUD extends \atk4\ui\View
 {
     /** @var BreadCrumb object */
@@ -13,8 +15,11 @@ class MasterCRUD extends \atk4\ui\View
     /** @var string Tab Label for detail */
     public $detailLabel = 'Details';
 
-   /** @var array of properties which are reserved for MasterCRUD and can't be used as model names */
+    /** @var array of properties which are reserved for MasterCRUD and can't be used as model names */
     protected $reserved_properties = ['_crud', '_tabs', '_card', 'menuActions', 'caption', 'columnActions'];
+
+    /** @var View */
+    protected $tabs;
 
     /**
      * Initialization.
@@ -49,7 +54,7 @@ class MasterCRUD extends \atk4\ui\View
         $this->crumb->addCrumb($this->getCaption($m), $this->url());
 
         // extract path
-        $this->path = explode('/', $this->stickyGet('path'));
+        $this->path = explode('/', $this->app->stickyGet('path'));
         if ($this->path[0] == '') {
             unset($this->path[0]);
         }
@@ -57,7 +62,7 @@ class MasterCRUD extends \atk4\ui\View
         $defs = $this->traverseModel($this->path, $defs);
 
         $arg_name = $this->model->table.'_id';
-        $arg_val = $this->stickyGet($arg_name);
+        $arg_val = $this->app->stickyGet($arg_name);
         if ($arg_val && $this->model->tryLoad($arg_val)->loaded()) {
             // initialize Tabs
             $this->initTabs($defs);
@@ -108,7 +113,7 @@ class MasterCRUD extends \atk4\ui\View
         }
 
         $this->tabs = $view->add($this->getTabsSeed($defs));
-        $this->tabs->stickyGet($this->model->table.'_id');
+        $this->app->stickyGet($this->model->table.'_id');
 
         $this->crumb->addCrumb($this->getTitle($this->model), $this->tabs->url());
 
@@ -376,8 +381,8 @@ class MasterCRUD extends \atk4\ui\View
             $m->load($arg_val);
 
             $this->crumb->addCrumb($this->getTitle($m), $this->url([
-                'path'=>$this->getPath($path_part)
-            ]));
+                                                                       'path'=>$this->getPath($path_part)
+                                                                   ]));
 
             $m = $m->ref($p);
             $path_part[]=$p;
