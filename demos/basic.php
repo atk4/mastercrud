@@ -11,7 +11,7 @@ $mc->setModel(new Client($app->db),
   [
     'Invoices'=>[
       'Lines'=>[
-        ['CRUD', 'displayFields' => ['item', 'total']]
+        ['_crud' => ['CRUD', 'displayFields' => ['item', 'total']]]
       ],
       'Allocations'=>[]
     ],
