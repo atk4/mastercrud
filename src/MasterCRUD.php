@@ -250,10 +250,10 @@ class MasterCRUD extends View
      *
      * @param array $defs
      *
-     * @return array
+     * @return array|View
      * @throws \atk4\core\Exception
      */
-    protected function getCRUDSeed(array $defs) :array
+    protected function getCRUDSeed(array $defs)
     {
         return $defs[0]['_crud'] ?? $this->defaultCrud;
     }
@@ -263,10 +263,10 @@ class MasterCRUD extends View
      *
      * @param array $defs
      *
-     * @return array
+     * @return array|View
      * @throws \atk4\core\Exception
      */
-    protected function getTabsSeed(array $defs) :array
+    protected function getTabsSeed(array $defs)
     {
         return $defs[0]['_tabs'] ?? $this->defaultTabs;
     }
@@ -276,10 +276,10 @@ class MasterCRUD extends View
      *
      * @param array $defs
      *
-     * @return array
+     * @return array|View
      * @throws \atk4\core\Exception
      */
-    protected function getCardSeed(array $defs) :array
+    protected function getCardSeed(array $defs)
     {
         return $defs[0]['_card'] ?? $this->defaultCard;
     }
