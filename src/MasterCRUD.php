@@ -75,8 +75,8 @@ class MasterCRUD extends View
      * );
      *
      *
-     * @param Model $m
-     * @param array $defs
+     * @param Model      $m
+     * @param array|null $defs
      *
      * @return \atk4\data\Model
      * @throws \atk4\core\Exception
@@ -95,7 +95,7 @@ class MasterCRUD extends View
             unset($this->path[0]);
         }
 
-        $defs = $this->traverseModel($this->path, $defs);
+        $defs = $this->traverseModel($this->path, $defs ?? []);
 
         $arg_name = $this->model->table.'_id';
         $arg_val = $this->app->stickyGet($arg_name);
