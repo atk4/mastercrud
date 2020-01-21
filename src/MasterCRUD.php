@@ -21,7 +21,7 @@ class MasterCRUD extends View
     public $detailLabel = 'Details';
 
     /** @var array of properties which are reserved for MasterCRUD and can't be used as model names */
-    protected $reserved_properties = ['_crud', '_tabs', '_card', 'caption'];
+    protected $reserved_properties = ['_crud', '_tabs', '_card', 'caption', 'columnActions', 'menuActions'];
 
     /** @var View Tabs view*/
     protected $tabs;
@@ -157,8 +157,8 @@ class MasterCRUD extends View
 
         // Use callback to refresh detail tabs when related model is changed.
         $this->tabs->addTab($this->detailLabel, function($p) use ($defs) {
-           $card = $p->add($this->getCardSeed($defs));
-           $card->setModel($this->model);
+            $card = $p->add($this->getCardSeed($defs));
+            $card->setModel($this->model);
         });
 
         if (!$defs) {
@@ -184,8 +184,34 @@ class MasterCRUD extends View
                     $this->sub_crud->addDecorator($m->title_field, ['Link', [$t=>false, 'path'=>$this->getPath($ref)], [$m->table.'_id'=>'id']]);
                 }
 
+                $this->addActions($this->sub_crud, $subdef);
+
             });
         }
+    }
+
+    /**
+     * Initialize CRUD.
+     *
+     * @param array $defs
+     * @param \atk4\ui\View $view Parent view
+     *
+     * @throws \atk4\core\Exception
+     */
+    public function initCrud(array $defs, View $view = null)
+    {
+        if ($view === null) {
+            $view = $this;
+        }
+
+        $this->crud = $view->add($this->getCRUDSeed($defs));
+        $this->crud->setModel($this->model);
+
+        if (isset($this->crud->table->columns[$this->model->title_field])) {
+            $this->crud->addDecorator($this->model->title_field, ['Link', [], [$this->model->table.'_id'=>'id']]);
+        }
+
+        $this->addActions($this->crud, $defs);
     }
 
     /**
@@ -224,24 +250,75 @@ class MasterCRUD extends View
     }
 
     /**
-     * Initialize CRUD.
+     * Adds CRUD action buttons.
      *
-     * @param array $defs
-     * @param \atk4\ui\View $view Parent view
-     *
-     * @throws \atk4\core\Exception
+     * @param \atk4\ui\CRUD $crud
+     * @param array         $defs
      */
-    public function initCrud(array $defs, View $view = null)
+    public function addActions($crud, $defs)
     {
-        if ($view === null) {
-            $view = $this;
+        if ($ma = $defs['menuActions'] ?? null) {
+
+            is_array($ma) || $ma = [$ma];
+
+            foreach($ma as $key => $action) {
+                if (is_numeric($key)) {
+                    $key = $action;
+                }
+
+                if (is_string($action)) {
+                    $crud->menu->addItem($key)->on(
+                        'click',
+                        new \atk4\ui\jsModal('Executing '.$key, $this->add('VirtualPage')->set(function($p) use($key, $action) {
+
+                            // TODO: this does ont work within a tab :(
+                            $p->add(new MethodExecutor($crud->model, $key));
+                        }))
+                    );
+                }
+
+                if ($action instanceof \Closure) {
+                    $crud->menu->addItem($key)->on(
+                        'click',
+                        new \atk4\ui\jsModal('Executing '.$key, $this->add('VirtualPage')->set(function($p) use($key, $action) {
+                            $action($p, $this->model, $key);
+                        }))
+                    );
+                }
+            }
         }
 
-        $this->crud = $view->add($this->getCRUDSeed($defs));
-        $this->crud->setModel($this->model);
+        if ($ca = $defs['columnActions'] ?? null) {
 
-        if (isset($this->crud->table->columns[$this->model->title_field])) {
-            $this->crud->addDecorator($this->model->title_field, ['Link', [], [$this->model->table.'_id'=>'id']]);
+            is_array($ca) || $ca = [$ca];
+
+            foreach($ca as $key => $action) {
+
+                if (is_numeric($key)) {
+                    $key = $action;
+                }
+
+                if (is_string($action)) {
+                    $label = ['icon'=>$action];
+                }
+
+                is_array($action) || $action = [$action];
+
+                if (isset($action['icon'])) {
+                    $label = ['icon'=>$action['icon']];
+                    unset($action['icon']);
+                }
+
+                if (isset($action[0]) && $action[0] instanceof \Closure) {
+                    $crud->addModalAction($label ?: $key, $key, function($p, $id) use($action, $key, $crud) {
+                        call_user_func($action[0], $p, $crud->model->load($id));
+                    });
+                } else {
+                    $crud->addModalAction($label ?: $key, $key, function($p, $id) use($action, $key, $crud) {
+                        $p->add(new MethodExecutor($crud->model->load($id), $key, $action));
+                    });
+                }
+            }
         }
     }
 
