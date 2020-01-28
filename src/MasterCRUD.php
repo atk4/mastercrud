@@ -3,9 +3,12 @@
 namespace atk4\mastercrud;
 
 use atk4\data\Model;
+use atk4\ui\BreadCrumb;
 use atk4\ui\Card;
 use atk4\ui\CardTable;
 use atk4\ui\CRUD;
+use atk4\ui\Exception;
+use atk4\ui\jsModal;
 use atk4\ui\Tabs;
 use atk4\ui\View;
 
@@ -14,7 +17,7 @@ class MasterCRUD extends View
     /** @var BreadCrumb object */
     public $crumb = null;
 
-    /** @var \atk4\data\Model the top-most model */
+    /** @var Model the top-most model */
     public $rootModel;
 
     /** @var string Tab Label for detail */
@@ -23,8 +26,14 @@ class MasterCRUD extends View
     /** @var array of properties which are reserved for MasterCRUD and can't be used as model names */
     protected $reserved_properties = ['_crud', '_tabs', '_card', 'caption', 'columnActions', 'menuActions'];
 
-    /** @var View Tabs view*/
+    /** @var string Delimiter to generate url path DO NOT USED '?', '#' or '/' */
+    protected $pathDelimiter = '-';
+
+    /** @var View Tabs view */
     protected $tabs;
+
+    /** @var array */
+    protected $path;
 
     /** @var array Default Crud for all model. You may override this value per model using $def['_crud'] in setModel */
     public $defaultCrud = [CRUD::class, 'ipp' => 25];
@@ -37,9 +46,14 @@ class MasterCRUD extends View
 
     /**
      * Initialization.
+     * @throws \atk4\core\Exception
      */
     public function init()
     {
+        if (in_array($this->pathDelimiter, ['?', '#', '/'])) {
+            throw new Exception('Can\'t use URL reserved charater (?,#,/) as path delimiter');
+        }
+
         // add BreadCrumb view
         if (!$this->crumb) {
             $this->crumb = $this->add(['BreadCrumb', 'Unspecified', 'big']);
@@ -78,7 +92,7 @@ class MasterCRUD extends View
      * @param Model      $m
      * @param array|null $defs
      *
-     * @return \atk4\data\Model
+     * @return Model
      * @throws \atk4\core\Exception
      * @throws \atk4\data\Exception
      * @throws \atk4\ui\Exception
@@ -90,7 +104,7 @@ class MasterCRUD extends View
         $this->crumb->addCrumb($this->getCaption($m), $this->url());
 
         // extract path
-        $this->path = explode('/', $this->app->stickyGet('path'));
+        $this->path = explode($this->pathDelimiter, $this->app->stickyGet('path'));
         if ($this->path[0] == '') {
             unset($this->path[0]);
         }
@@ -115,11 +129,11 @@ class MasterCRUD extends View
     /**
      * Return model caption.
      *
-     * @param \atk4\data\Model $m
+     * @param Model $m
      *
      * @return string
      */
-    public function getCaption($m)
+    public function getCaption(Model $m) :string
     {
         return $m->getModelCaption();
     }
@@ -127,11 +141,11 @@ class MasterCRUD extends View
     /**
      * Return title field value.
      *
-     * @param \atk4\data\Model
+     * @param Model $m
      *
      * @return string
      */
-    public function getTitle($m)
+    public function getTitle(Model $m) :string
     {
         return $m->getTitle();
     }
@@ -140,7 +154,7 @@ class MasterCRUD extends View
      * Initialize tabs.
      *
      * @param array $defs
-     * @param \atk4\ui\View $view Parent view
+     * @param View $view Parent view
      *
      * @throws \atk4\core\Exception
      */
@@ -175,16 +189,16 @@ class MasterCRUD extends View
 
             $this->tabs->addTab($caption, function($p) use($subdef, $m, $ref) {
 
-                $this->sub_crud = $p->add($this->getCRUDSeed($subdef));
+                $sub_crud = $p->add($this->getCRUDSeed($subdef));
 
-                $this->sub_crud->setModel(clone $m);
+                $sub_crud->setModel(clone $m);
                 $t = $p->urlTrigger ?: $p->name;
 
-                if (isset($this->sub_crud->table->columns[$m->title_field])) {
-                    $this->sub_crud->addDecorator($m->title_field, ['Link', [$t=>false, 'path'=>$this->getPath($ref)], [$m->table.'_id'=>'id']]);
+                if (isset($sub_crud->table->columns[$m->title_field])) {
+                    $sub_crud->addDecorator($m->title_field, ['Link', [$t => false, 'path' => $this->getPath($ref)], [$m->table.'_id'=>'id']]);
                 }
 
-                $this->addActions($this->sub_crud, $subdef);
+                $this->addActions($sub_crud, $subdef);
 
             });
         }
@@ -194,7 +208,7 @@ class MasterCRUD extends View
      * Initialize CRUD.
      *
      * @param array $defs
-     * @param \atk4\ui\View $view Parent view
+     * @param View $view Parent view
      *
      * @throws \atk4\core\Exception
      */
@@ -204,14 +218,14 @@ class MasterCRUD extends View
             $view = $this;
         }
 
-        $this->crud = $view->add($this->getCRUDSeed($defs));
-        $this->crud->setModel($this->model);
+        $crud = $view->add($this->getCRUDSeed($defs));
+        $crud->setModel($this->model);
 
-        if (isset($this->crud->table->columns[$this->model->title_field])) {
-            $this->crud->addDecorator($this->model->title_field, ['Link', [], [$this->model->table.'_id'=>'id']]);
+        if (isset($crud->table->columns[$this->model->title_field])) {
+            $crud->addDecorator($this->model->title_field, ['Link', [], [$this->model->table.'_id'=>'id']]);
         }
 
-        $this->addActions($this->crud, $defs);
+        $this->addActions($crud, $defs);
     }
 
     /**
@@ -227,7 +241,7 @@ class MasterCRUD extends View
         $path = $this->path;
 
         if (!is_array($rel)) {
-            $rel = explode('/', $rel);
+            $rel = explode($this->pathDelimiter, $rel);
         }
 
         foreach($rel as $rel_one) {
@@ -244,7 +258,7 @@ class MasterCRUD extends View
             $path[] = $rel_one;
         }
 
-        $res = join('/', $path);
+        $res = join($this->pathDelimiter, $path);
 
         return $res == '' ? false : $res;
     }
@@ -252,8 +266,10 @@ class MasterCRUD extends View
     /**
      * Adds CRUD action buttons.
      *
-     * @param \atk4\ui\CRUD $crud
-     * @param array         $defs
+     * @param View $crud
+     * @param array $defs
+     *
+     * @throws \atk4\core\Exception
      */
     public function addActions($crud, $defs)
     {
@@ -269,7 +285,7 @@ class MasterCRUD extends View
                 if (is_string($action)) {
                     $crud->menu->addItem($key)->on(
                         'click',
-                        new \atk4\ui\jsModal('Executing '.$key, $this->add('VirtualPage')->set(function($p) use($key, $action) {
+                        new jsModal('Executing '.$key, $this->add('VirtualPage')->set(function($p) use($key, $action, $crud) {
 
                             // TODO: this does ont work within a tab :(
                             $p->add(new MethodExecutor($crud->model, $key));
@@ -280,7 +296,7 @@ class MasterCRUD extends View
                 if ($action instanceof \Closure) {
                     $crud->menu->addItem($key)->on(
                         'click',
-                        new \atk4\ui\jsModal('Executing '.$key, $this->add('VirtualPage')->set(function($p) use($key, $action) {
+                        new jsModal('Executing '.$key, $this->add('VirtualPage')->set(function($p) use($key, $action) {
                             $action($p, $this->model, $key);
                         }))
                     );
@@ -395,7 +411,7 @@ class MasterCRUD extends View
             $arg_val = $this->app->stickyGet($arg_name);
 
             if ($arg_val === null) {
-                throw new \atk4\ui\Exception(['Argument value is not specified', 'arg'=>$arg_name]);
+                throw new Exception(['Argument value is not specified', 'arg'=>$arg_name]);
             }
 
             // load record and traverse
