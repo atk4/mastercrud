@@ -17,7 +17,7 @@ class MasterCRUD extends View
     /** @var BreadCrumb object */
     public $crumb = null;
 
-    /** @var \atk4\data\Model the top-most model */
+    /** @var Model the top-most model */
     public $rootModel;
 
     /** @var string Tab Label for detail */
@@ -29,7 +29,7 @@ class MasterCRUD extends View
     /** @var string Delimiter to generate url path DO NOT USED '?', '#' or '/' */
     protected $pathDelimiter = '-';
 
-    /** @var View Tabs view*/
+    /** @var View Tabs view */
     protected $tabs;
 
     /** @var array */
@@ -50,8 +50,8 @@ class MasterCRUD extends View
      */
     public function init()
     {
-        if ($this->pathDelimiter === '?' || $this->pathDelimiter === '#' || $this->pathDelimiter === '/') {
-            throw new Exception('Can\'t use Url reserved charater (?,#,/) for path delimiter');
+        if (in_array($this->pathDelimiter, ['?', '#', '/'])) {
+            throw new Exception('Can\'t use URL reserved charater (?,#,/) as path delimiter');
         }
 
         // add BreadCrumb view
@@ -92,7 +92,7 @@ class MasterCRUD extends View
      * @param Model      $m
      * @param array|null $defs
      *
-     * @return \atk4\data\Model
+     * @return Model
      * @throws \atk4\core\Exception
      * @throws \atk4\data\Exception
      * @throws \atk4\ui\Exception
@@ -129,11 +129,11 @@ class MasterCRUD extends View
     /**
      * Return model caption.
      *
-     * @param \atk4\data\Model $m
+     * @param Model $m
      *
      * @return string
      */
-    public function getCaption($m)
+    public function getCaption(Model $m) :string
     {
         return $m->getModelCaption();
     }
@@ -141,7 +141,7 @@ class MasterCRUD extends View
     /**
      * Return title field value.
      *
-     * @param \atk4\data\Model
+     * @param Model $m
      *
      * @return string
      */
@@ -208,7 +208,7 @@ class MasterCRUD extends View
      * Initialize CRUD.
      *
      * @param array $defs
-     * @param \atk4\ui\View $view Parent view
+     * @param View $view Parent view
      *
      * @throws \atk4\core\Exception
      */
