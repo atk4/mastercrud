@@ -25,10 +25,6 @@
     }
   ],
   "require": {
-    "atk4/ui": "dev-develop",
-    "php": ">=7.2.0"
-  },
-  "require-release": {
     "atk4/ui": "^2.0",
     "php": ">=7.2.0"
   },
