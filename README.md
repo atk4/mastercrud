@@ -19,6 +19,28 @@ The syntax of **MasterCRUD** is incredibly simple and short. It automatically ta
 
 ### Example Use Case (see demos/clients.php for full demo):
 
+Assuming you have Clients with Invoices and Payments and you also want to add "Line"s for each Invoice, you may want to add this interface for the admin, where user can use drill-downs to navigate through data:
+
+![step1](docs/images/step1.png)
+
+Clicking on `Client 2` would bring you to a different page. Extra tabs Invoices and Payments offer you further way in:
+
+![step2](docs/images/step2.png)
+
+clicking on specific invoice, you can edit it's lines:
+
+![step3](docs/images/step3.png)
+
+On this screen however we turned off deletion of lines (because it is a demo). However clicking Edit brings up a Modal where you can easily update record data:
+
+![step4](docs/images/step4.png)
+
+
+
+All this UI can be created in just a few lines of code!
+
+
+
 MasterCRUD operates like a regular CRUD, and you can easily substitute it in:
 
 ``` php
@@ -47,7 +69,7 @@ $crud = $app->add('\atk4\mastercrud\MasterCRUD');
 $crud->setModel('Client', ['Invoices'=>['Lines'=>[]], 'Payments'=>[]]);
 ```
 
-So far I've shown you examples of "hasMany" relations, but it's possible to also traverse "hasOne". I am going to clean up the above example into this:
+With some cleanup, this syntax is readable and nice:
 
 ``` php
 $crud = $app->add('\atk4\mastercrud\MasterCRUD');
@@ -58,6 +80,86 @@ $crud->setModel('Client', [
   'Payments'=>[]
 ]);
 ```
+
+## Support for actions
+
+MasterCRUD is awesome for quickly creating admin systems. But basic C,R,U,D operations are not enough. Sometimes you want to invoke custom actions for individual element. MasterCRUD now supports that too:
+
+```php
+$app->layout->add(new \atk4\mastercrud\MasterCRUD())
+    ->setModel(new \saasty\Model\App($app->db), 
+    [
+        'columnActions'=>[
+            'repair'=>['icon'=>'wrench'],
+        ],
+        'Models'=>[
+            'columnActions'=>[
+                'migrate'=>['icon'=>'database'],
+            ],
+            'Fields'=>[
+                'ValidationRules'=>[],
+            
+            ],
+            'Relations'=>[
+                'ImportedFields'=>[],
+            ],
+        ],
+```
+
+ ![actions](docs/images/actions.png)
+
+There are various invocation methods allowing you to specify icon, label, custom callbacks etc.
+
+This also adds "MethodInvocator" - a view which asks you for arguments and then executes them.
+
+This next example will use form to ask for an email, which will then be passed as argument to sendEmail($email)
+
+```php
+[
+    'columnActions'=>[
+         'sendEmail' => ['icon'=>'wrench', 'email'=>'string']
+   ]
+]
+```
+
+
+
+
+
+### Installation
+
+Install through composer: 
+
+``` bash
+ composer require atk4/mastercrud
+```
+
+Also see introduction for [ATK UI](https://github.com/atk4/ui) on how to render HTML.
+
+## Roadmap
+
+- [x] Allow to specify custom CRUD seed. You can ever replace it with your own compatible view.
+- [x] Add custom actions and function invocation
+- [ ] Create decent "View" mode (relies on ATK UI Card)
+- [ ] Traverse hasOne references (see below)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-------------------------
+
+> NOT IMPLEMENTED BELOW
 
 Suppose that `Invoice hasMany(Allocation)`and `Payment hasMany(Allocation)` while allocation can have one Payment and one Invoice.
 
@@ -94,93 +196,5 @@ $crud->setModel('Client', [
 ```
 
 Now you will be able to jump from `Invoice->allocation` to `Payment` and other way around.
-
-### Installation
-
-Install through composer (`composer require atk4\mastercrud`).
-
-
-
-
-
-
-
-
-
-
-
-
-
-----------
-
-OLD DOCS
-
-
-
-
-
-
-
-![step1](docs/images/step1.png)
-
-Selecting client shows a detailed view:
-
-![step2](docs/images/step2.png) 
-
-Although not shown in this reference screenshot, but certain values (such as currency, payee, article, etc) may be configured to be clickable. Next if you open Payments tab, then `$client->ref('Payments')` will be set up for the CRUD:
-
-![step3](docs/images/step3.png)
-
-This can go as deep as necessary.
-
-**CRUDCeption** can also be used with recursive models (which reference themselves)
-
-### Installation and Use
-
-Install through composer (`composer require atk4\crudception`) then use this code:
-
-``` php
-$app->add('\atk4\crudception\CRUD');
-$app->setModel(
-  new Client($app->db), 
-  [
-    'Payment'=>[
-      'Payments',
-      'contact_id'=>'/',
-      'Allocation'=>[
-        // empty means this is just a crud
-      ]
-      
-    ],
-    'PayAcc'=>[
-      // seeding CRUD / View
-      ['\atk4\crudception\CRUD', 'Payments on Account', ['name'], ['name', 'surname']],
-    ]
-  ]
-);
-```
-
-If it's unclear from the example above, then `setModel` second argument is passed an array in format: `relation => definition`.
-
-The element with index `0` can be a seed for populating a `atk4\crudception\CRUD`. Other keys must match existing reference within the model. `hasOne` references can be passed a "Path", where '/' refers to the top-most node and then you can specify reference, e.g. `/Payment/Allocation`. All the entity arguments will be passed along: `payment_id=123&allocation_id=234234`. You can make link to a different page by passing array: `['otherpage', 'id'=>'payment_id']`; in which case values of `id` will be mapped to `123`.
-
-For `hasMany` relation, you have to specify an Array or a Callback. If you specify an Array, then it should also contain same definition. You can also specify a path here.
-
-### How does it work
-
-CRUD uses a Callback with 3 triggers - browsing, editing and deleting. CRUDception\CRUD implements another state called `detail` which will be linked to the Title column. 
-
-In this state, Tabs are added and the first column displays a selected model detail with a links to `hasOne` relations. Other tabs will contain `hasMany` relations.
-
-
-
-
-
-See `demos/` for example usage. The above will have no impact, but will enable you to use other components.
-
-## Roadmap
-
-Generally we wish to keep this add-on clean, but very extensible, with various tutorials on how to implement various scenarios.
-
 
 

@@ -8,7 +8,17 @@ $mc = $app->add([
     'quickSearch'=>['name'],
 ]);
 $mc->setModel(new Client($app->db),
-    ['Invoices'=>['Lines'=>['CRUD', 'canDelete'=>false], 'Allocations'=>[]], 'Payments'=>['Allocations'=>[]]]
+  [
+    'Invoices'=>[
+      'Lines'=>[
+        ['_crud' => ['CRUD', 'displayFields' => ['item', 'total']]]
+      ],
+      'Allocations'=>[]
+    ],
+    'Payments'=>[
+      'Allocations'=>[]
+    ]
+  ]
 );
 
 

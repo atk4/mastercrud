@@ -11,7 +11,7 @@ try {
     $app->dbConnect('pgsql://root:root@localhost/root');
 }catch (\Exception $e) {
     $app->add(['Message', 'Database is not available', 'error'])->text
-        ->addParagraph('Import file demos/mastercrud.sql and see demos/db.php')
+        ->addParagraph('Import file demos/mastercrud.pgsql and see demos/db.php')
         ->addParagraph($e->getMessage());
     exit;
 }
