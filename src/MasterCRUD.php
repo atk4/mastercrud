@@ -185,7 +185,7 @@ class MasterCRUD extends View
             }
             $m = $this->model->ref($ref);
 
-            $caption = $m->getModelCaption();
+            $caption = $this->model->getRef($ref)->caption ?? $this->getCaption($m);
 
             $this->tabs->addTab($caption, function($p) use($subdef, $m, $ref) {
 
