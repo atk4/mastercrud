@@ -17,6 +17,9 @@ class MasterCRUD extends View
     /** @var BreadCrumb object */
     public $crumb = null;
 
+    /** @var array Default BreadCrumb seed */
+    public $defaultCrumb = [BreadCrumb::class, 'Unspecified', 'big'];
+
     /** @var Model the top-most model */
     public $rootModel;
 
@@ -56,9 +59,9 @@ class MasterCRUD extends View
 
         // add BreadCrumb view
         if (!$this->crumb) {
-            $this->crumb = $this->add(['BreadCrumb', 'Unspecified', 'big']);
+            $this->crumb = $this->add($this->defaultCrumb);
         }
-        $this->add(['ui'=>'divider']);
+        $this->add([View::class, 'ui'=>'divider']);
 
         parent::init();
     }
