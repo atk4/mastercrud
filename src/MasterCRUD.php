@@ -114,7 +114,7 @@ class MasterCRUD extends View
 
         $defs = $this->traverseModel($this->path, $defs ?? []);
 
-        $arg_name = $this->model->table.'_id';
+        $arg_name = $this->model->table . '_id';
         $arg_val = $this->app->stickyGet($arg_name);
         if ($arg_val && $this->model->tryLoad($arg_val)->loaded()) {
             // initialize Tabs
@@ -136,7 +136,7 @@ class MasterCRUD extends View
      *
      * @return string
      */
-    public function getCaption(Model $m) :string
+    public function getCaption(Model $m): string
     {
         return $m->getModelCaption();
     }
@@ -148,7 +148,7 @@ class MasterCRUD extends View
      *
      * @return string
      */
-    public function getTitle(Model $m) :string
+    public function getTitle(Model $m): string
     {
         return $m->getTitle();
     }
@@ -168,12 +168,12 @@ class MasterCRUD extends View
         }
 
         $this->tabs = $view->add($this->getTabsSeed($defs));
-        $this->app->stickyGet($this->model->table.'_id');
+        $this->app->stickyGet($this->model->table . '_id');
 
         $this->crumb->addCrumb($this->getTitle($this->model), $this->tabs->url());
 
         // Use callback to refresh detail tabs when related model is changed.
-        $this->tabs->addTab($this->detailLabel, function($p) use ($defs) {
+        $this->tabs->addTab($this->detailLabel, function ($p) use ($defs) {
             $card = $p->add($this->getCardSeed($defs));
             $card->setModel($this->model);
         });
@@ -190,19 +190,17 @@ class MasterCRUD extends View
 
             $caption = $this->model->getRef($ref)->caption ?? $this->getCaption($m);
 
-            $this->tabs->addTab($caption, function($p) use($subdef, $m, $ref) {
-
+            $this->tabs->addTab($caption, function ($p) use ($subdef, $m, $ref) {
                 $sub_crud = $p->add($this->getCRUDSeed($subdef));
 
                 $sub_crud->setModel(clone $m);
                 $t = $p->urlTrigger ?: $p->name;
 
                 if (isset($sub_crud->table->columns[$m->title_field])) {
-                    $sub_crud->addDecorator($m->title_field, ['Link', [$t => false, 'path' => $this->getPath($ref)], [$m->table.'_id'=>'id']]);
+                    $sub_crud->addDecorator($m->title_field, ['Link', [$t => false, 'path' => $this->getPath($ref)], [$m->table . '_id'=>'id']]);
                 }
 
                 $this->addActions($sub_crud, $subdef);
-
             });
         }
     }
@@ -225,7 +223,7 @@ class MasterCRUD extends View
         $crud->setModel($this->model);
 
         if (isset($crud->table->columns[$this->model->title_field])) {
-            $crud->addDecorator($this->model->title_field, ['Link', [], [$this->model->table.'_id'=>'id']]);
+            $crud->addDecorator($this->model->title_field, ['Link', [], [$this->model->table . '_id'=>'id']]);
         }
 
         $this->addActions($crud, $defs);
@@ -247,7 +245,7 @@ class MasterCRUD extends View
             $rel = explode($this->pathDelimiter, $rel);
         }
 
-        foreach($rel as $rel_one) {
+        foreach ($rel as $rel_one) {
             if ($rel_one == '..') {
                 array_pop($path);
                 continue;
@@ -277,10 +275,9 @@ class MasterCRUD extends View
     public function addActions($crud, $defs)
     {
         if ($ma = $defs['menuActions'] ?? null) {
-
             is_array($ma) || $ma = [$ma];
 
-            foreach($ma as $key => $action) {
+            foreach ($ma as $key => $action) {
                 if (is_numeric($key)) {
                     $key = $action;
                 }
@@ -288,7 +285,7 @@ class MasterCRUD extends View
                 if (is_string($action)) {
                     $crud->menu->addItem($key)->on(
                         'click',
-                        new jsModal('Executing '.$key, $this->add('VirtualPage')->set(function($p) use($key, $action, $crud) {
+                        new jsModal('Executing ' . $key, $this->add('VirtualPage')->set(function ($p) use ($key, $action, $crud) {
 
                             // TODO: this does ont work within a tab :(
                             $p->add(new MethodExecutor($crud->model, $key));
@@ -299,7 +296,7 @@ class MasterCRUD extends View
                 if ($action instanceof \Closure) {
                     $crud->menu->addItem($key)->on(
                         'click',
-                        new jsModal('Executing '.$key, $this->add('VirtualPage')->set(function($p) use($key, $action) {
+                        new jsModal('Executing ' . $key, $this->add('VirtualPage')->set(function ($p) use ($key, $action) {
                             $action($p, $this->model, $key);
                         }))
                     );
@@ -308,11 +305,9 @@ class MasterCRUD extends View
         }
 
         if ($ca = $defs['columnActions'] ?? null) {
-
             is_array($ca) || $ca = [$ca];
 
-            foreach($ca as $key => $action) {
-
+            foreach ($ca as $key => $action) {
                 if (is_numeric($key)) {
                     $key = $action;
                 }
@@ -329,11 +324,11 @@ class MasterCRUD extends View
                 }
 
                 if (isset($action[0]) && $action[0] instanceof \Closure) {
-                    $crud->addModalAction($label ?: $key, $key, function($p, $id) use($action, $key, $crud) {
+                    $crud->addModalAction($label ?: $key, $key, function ($p, $id) use ($action, $key, $crud) {
                         call_user_func($action[0], $p, $crud->model->load($id));
                     });
                 } else {
-                    $crud->addModalAction($label ?: $key, $key, function($p, $id) use($action, $key, $crud) {
+                    $crud->addModalAction($label ?: $key, $key, function ($p, $id) use ($action, $key, $crud) {
                         $p->add(new MethodExecutor($crud->model->load($id), $key, $action));
                     });
                 }
@@ -391,14 +386,13 @@ class MasterCRUD extends View
      * @throws \atk4\data\Exception
      * @throws \atk4\ui\Exception
      */
-    public function traverseModel(array $path, array $defs) :array
+    public function traverseModel(array $path, array $defs): array
     {
         $m = $this->rootModel;
 
         $path_part = [''];
 
-        foreach($path as $p) {
-
+        foreach ($path as $p) {
             if (!$p) {
                 continue;
             }
@@ -410,7 +404,7 @@ class MasterCRUD extends View
             $defs = $defs[$p];
 
             // argument of a current model should be passed if we are traversing
-            $arg_name = $m->table.'_id';
+            $arg_name = $m->table . '_id';
             $arg_val = $this->app->stickyGet($arg_name);
 
             if ($arg_val === null) {

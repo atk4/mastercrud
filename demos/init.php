@@ -9,7 +9,7 @@ $app->initLayout('Centered');
 // change this as needed
 try {
     $app->dbConnect('pgsql://root:root@localhost/root');
-}catch (\Exception $e) {
+} catch (\Exception $e) {
     $app->add(['Message', 'Database is not available', 'error'])->text
         ->addParagraph('Import file demos/mastercrud.pgsql and see demos/db.php')
         ->addParagraph($e->getMessage());
@@ -17,9 +17,11 @@ try {
 }
 
 
-class Client extends \atk4\data\Model {
+class Client extends \atk4\data\Model
+{
     public $table = 'client';
-    function init() {
+    public function init()
+    {
         parent::init();
 
         $this->addField('name', ['required'=>true]);
@@ -28,13 +30,14 @@ class Client extends \atk4\data\Model {
         $this->hasMany('Invoices', new Invoice());
         $this->hasMany('Payments', new Payment());
     }
-
 }
 
-class Invoice extends \atk4\data\Model {
+class Invoice extends \atk4\data\Model
+{
     public $table = 'invoice';
     public $title_field = 'ref_no';
-    function init() {
+    public function init()
+    {
         parent::init();
 
         $this->hasOne('client_id', new Client());
@@ -49,10 +52,12 @@ class Invoice extends \atk4\data\Model {
     }
 }
 
-class Line extends \atk4\data\Model {
+class Line extends \atk4\data\Model
+{
     public $table = 'line';
     public $title_field = 'item';
-    function init() {
+    public function init()
+    {
         parent::init();
 
         $this->hasOne('invoice_id', new Invoice());
@@ -64,10 +69,12 @@ class Line extends \atk4\data\Model {
     }
 }
 
-class Payment extends \atk4\data\Model {
+class Payment extends \atk4\data\Model
+{
     public $table = 'payment';
     public $title_field = 'ref_no';
-    function init() {
+    public function init()
+    {
         parent::init();
 
         $this->hasOne('client_id', new Client());
@@ -80,11 +87,13 @@ class Payment extends \atk4\data\Model {
     }
 }
 
-class Allocation extends \atk4\data\Model {
+class Allocation extends \atk4\data\Model
+{
     public $table = 'allocation';
     public $title_field = 'title';
 
-    function init() {
+    public function init()
+    {
         parent::init();
 
         $this->addExpression('title', '\'Alloc \' || [id]');
@@ -94,6 +103,3 @@ class Allocation extends \atk4\data\Model {
         $this->addField('allocated', ['type'=>'money']);
     }
 }
-
-
-

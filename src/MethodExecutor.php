@@ -1,4 +1,5 @@
 <?php
+
 namespace atk4\mastercrud;
 
 /**
@@ -56,9 +57,9 @@ class MethodExecutor extends \atk4\ui\View
 
         $this->form = $this->add('Form');
 
-        foreach($this->defs as $key=>$val) {
+        foreach ($this->defs as $key=>$val) {
             if (is_numeric($key)) {
-                $key = 'Argument'.$key;
+                $key = 'Argument' . $key;
             }
 
             if (is_callable($val)) {
@@ -74,19 +75,19 @@ class MethodExecutor extends \atk4\ui\View
 
         $this->form->buttonSave->set('Run');
 
-        $this->form->onSubmit(function($f) {
+        $this->form->onSubmit(function ($f) {
             $this->memorize('data', $f->model ? $f->model->get(): []);
 
             return [$this->console->js()->show(), $this->console->sse];
         });
 
-        $this->console->set(function($c) {
+        $this->console->set(function ($c) {
             $data = $this->recall('data');
             $args = [];
 
-            foreach($this->defs as $key=>$val) {
+            foreach ($this->defs as $key=>$val) {
                 if (is_numeric($key)) {
-                    $key = 'Argument'.$key;
+                    $key = 'Argument' . $key;
                 }
 
                 if (is_callable($val)) {
