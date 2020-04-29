@@ -51,7 +51,7 @@ class MasterCRUD extends View
      * Initialization.
      * @throws \atk4\core\Exception
      */
-    public function init()
+    public function init(): void
     {
         if (in_array($this->pathDelimiter, ['?', '#', '/'])) {
             throw new Exception('Can\'t use URL reserved charater (?,#,/) as path delimiter');
@@ -100,7 +100,7 @@ class MasterCRUD extends View
      * @throws \atk4\data\Exception
      * @throws \atk4\ui\Exception
      */
-    public function setModel(Model $m, array $defs = null)
+    public function setModel(Model $m, array $defs = null): Model
     {
         $this->rootModel = $m;
 
@@ -272,7 +272,7 @@ class MasterCRUD extends View
      *
      * @throws \atk4\core\Exception
      */
-    public function addActions($crud, $defs)
+    public function addActions(View $crud, array $defs)
     {
         if ($ma = $defs['menuActions'] ?? null) {
             is_array($ma) || $ma = [$ma];
