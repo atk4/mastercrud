@@ -234,6 +234,7 @@ class MasterCRUD extends View
         foreach ($rel as $rel_one) {
             if ($rel_one === '..') {
                 array_pop($path);
+
                 continue;
             }
 

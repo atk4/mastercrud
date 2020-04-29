@@ -13,12 +13,12 @@ $mc->setModel(
     [
         'Invoices' => [
             'Lines' => [
-                ['_crud' => ['CRUD', 'displayFields' => ['item', 'total']]]
+                ['_crud' => ['CRUD', 'displayFields' => ['item', 'total']]],
             ],
-            'Allocations' => []
+            'Allocations' => [],
         ],
         'Payments' => [
-            'Allocations' => []
-        ]
+            'Allocations' => [],
+        ],
     ]
 );
