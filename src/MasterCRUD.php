@@ -15,7 +15,7 @@ use atk4\ui\View;
 class MasterCRUD extends View
 {
     /** @var BreadCrumb object */
-    public $crumb = null;
+    public $crumb;
 
     /** @var array Default BreadCrumb seed */
     public $defaultCrumb = [BreadCrumb::class, 'Unspecified', 'big'];
@@ -38,22 +38,23 @@ class MasterCRUD extends View
     /** @var array */
     protected $path;
 
-    /** @var array Default Crud for all model. You may override this value per model using $def['_crud'] in setModel */
+    /** @var array Default Crud for all model. You may override this value per model using['_crud'] in setModel */
     public $defaultCrud = [CRUD::class, 'ipp' => 25];
 
-    /** @var array Default Tabs for all model. You may override this value per model using $def['_tabs'] in setModel */
+    /** @var array Default Tabs for all model. You may override this value per model using['_tabs'] in setModel */
     public $defaultTabs = [Tabs::class];
 
-    /** @var array Default Card for all model. You may override this value per model using $def['_card'] in setModel */
+    /** @var array Default Card for all model. You may override this value per model using['_card'] in setModel */
     public $defaultCard = [CardTable::class];
 
     /**
      * Initialization.
+     *
      * @throws \atk4\core\Exception
      */
     public function init(): void
     {
-        if (in_array($this->pathDelimiter, ['?', '#', '/'])) {
+        if (in_array($this->pathDelimiter, ['?', '#', '/'], true)) {
             throw new Exception('Can\'t use URL reserved charater (?,#,/) as path delimiter');
         }
 
@@ -61,7 +62,7 @@ class MasterCRUD extends View
         if (!$this->crumb) {
             $this->crumb = $this->add($this->defaultCrumb);
         }
-        $this->add([View::class, 'ui'=>'divider']);
+        $this->add([View::class, 'ui' => 'divider']);
 
         parent::init();
     }
@@ -91,11 +92,6 @@ class MasterCRUD extends View
      *   ]
      * );
      *
-     *
-     * @param Model      $m
-     * @param array|null $defs
-     *
-     * @return Model
      * @throws \atk4\core\Exception
      * @throws \atk4\data\Exception
      * @throws \atk4\ui\Exception
@@ -108,7 +104,7 @@ class MasterCRUD extends View
 
         // extract path
         $this->path = explode($this->pathDelimiter, $this->app->stickyGet('path'));
-        if ($this->path[0] == '') {
+        if ($this->path[0] === '') {
             unset($this->path[0]);
         }
 
@@ -131,10 +127,6 @@ class MasterCRUD extends View
 
     /**
      * Return model caption.
-     *
-     * @param Model $m
-     *
-     * @return string
      */
     public function getCaption(Model $m): string
     {
@@ -143,10 +135,6 @@ class MasterCRUD extends View
 
     /**
      * Return title field value.
-     *
-     * @param Model $m
-     *
-     * @return string
      */
     public function getTitle(Model $m): string
     {
@@ -156,7 +144,6 @@ class MasterCRUD extends View
     /**
      * Initialize tabs.
      *
-     * @param array $defs
      * @param View $view Parent view
      *
      * @throws \atk4\core\Exception
@@ -183,7 +170,7 @@ class MasterCRUD extends View
         }
 
         foreach ($defs as $ref => $subdef) {
-            if (is_numeric($ref) || in_array($ref, $this->reserved_properties)) {
+            if (is_numeric($ref) || in_array($ref, $this->reserved_properties, true)) {
                 continue;
             }
             $m = $this->model->ref($ref);
@@ -197,7 +184,7 @@ class MasterCRUD extends View
                 $t = $p->urlTrigger ?: $p->name;
 
                 if (isset($sub_crud->table->columns[$m->title_field])) {
-                    $sub_crud->addDecorator($m->title_field, ['Link', [$t => false, 'path' => $this->getPath($ref)], [$m->table . '_id'=>'id']]);
+                    $sub_crud->addDecorator($m->title_field, ['Link', [$t => false, 'path' => $this->getPath($ref)], [$m->table . '_id' => 'id']]);
                 }
 
                 $this->addActions($sub_crud, $subdef);
@@ -208,7 +195,6 @@ class MasterCRUD extends View
     /**
      * Initialize CRUD.
      *
-     * @param array $defs
      * @param View $view Parent view
      *
      * @throws \atk4\core\Exception
@@ -223,7 +209,7 @@ class MasterCRUD extends View
         $crud->setModel($this->model);
 
         if (isset($crud->table->columns[$this->model->title_field])) {
-            $crud->addDecorator($this->model->title_field, ['Link', [], [$this->model->table . '_id'=>'id']]);
+            $crud->addDecorator($this->model->title_field, ['Link', [], [$this->model->table . '_id' => 'id']]);
         }
 
         $this->addActions($crud, $defs);
@@ -246,29 +232,27 @@ class MasterCRUD extends View
         }
 
         foreach ($rel as $rel_one) {
-            if ($rel_one == '..') {
+            if ($rel_one === '..') {
                 array_pop($path);
                 continue;
             }
 
-            if ($rel_one == '') {
+            if ($rel_one === '') {
                 $path = [];
+
                 continue;
             }
 
             $path[] = $rel_one;
         }
 
-        $res = join($this->pathDelimiter, $path);
+        $res = implode($this->pathDelimiter, $path);
 
-        return $res == '' ? false : $res;
+        return $res === '' ? false : $res;
     }
 
     /**
      * Adds CRUD action buttons.
-     *
-     * @param View $crud
-     * @param array $defs
      *
      * @throws \atk4\core\Exception
      */
@@ -286,7 +270,6 @@ class MasterCRUD extends View
                     $crud->menu->addItem($key)->on(
                         'click',
                         new jsModal('Executing ' . $key, $this->add('VirtualPage')->set(function ($p) use ($key, $action, $crud) {
-
                             // TODO: this does ont work within a tab :(
                             $p->add(new MethodExecutor($crud->model, $key));
                         }))
@@ -313,13 +296,13 @@ class MasterCRUD extends View
                 }
 
                 if (is_string($action)) {
-                    $label = ['icon'=>$action];
+                    $label = ['icon' => $action];
                 }
 
                 is_array($action) || $action = [$action];
 
                 if (isset($action['icon'])) {
-                    $label = ['icon'=>$action['icon']];
+                    $label = ['icon' => $action['icon']];
                     unset($action['icon']);
                 }
 
@@ -339,10 +322,9 @@ class MasterCRUD extends View
     /**
      * Return seed for CRUD.
      *
-     * @param array $defs
+     * @throws \atk4\core\Exception
      *
      * @return array|View
-     * @throws \atk4\core\Exception
      */
     protected function getCRUDSeed(array $defs)
     {
@@ -352,10 +334,9 @@ class MasterCRUD extends View
     /**
      * Return seed for Tabs.
      *
-     * @param array $defs
+     * @throws \atk4\core\Exception
      *
      * @return array|View
-     * @throws \atk4\core\Exception
      */
     protected function getTabsSeed(array $defs)
     {
@@ -365,10 +346,9 @@ class MasterCRUD extends View
     /**
      * Return seed for Card.
      *
-     * @param array $defs
+     * @throws \atk4\core\Exception
      *
      * @return array|View
-     * @throws \atk4\core\Exception
      */
     protected function getCardSeed(array $defs)
     {
@@ -378,10 +358,6 @@ class MasterCRUD extends View
     /**
      * Given a path and arguments, find and load the right model.
      *
-     * @param array $path
-     * @param array $defs
-     *
-     * @return array
      * @throws \atk4\core\Exception
      * @throws \atk4\data\Exception
      * @throws \atk4\ui\Exception
@@ -398,7 +374,7 @@ class MasterCRUD extends View
             }
 
             if (!isset($defs[$p])) {
-                throw new Exception(['Path is not defined', 'path'=>$path, 'defs'=>$defs]);
+                throw new Exception(['Path is not defined', 'path' => $path, 'defs' => $defs]);
             }
 
             $defs = $defs[$p];
@@ -408,7 +384,7 @@ class MasterCRUD extends View
             $arg_val = $this->app->stickyGet($arg_name);
 
             if ($arg_val === null) {
-                throw new Exception(['Argument value is not specified', 'arg'=>$arg_name]);
+                throw new Exception(['Argument value is not specified', 'arg' => $arg_name]);
             }
 
             // load record and traverse
@@ -416,11 +392,11 @@ class MasterCRUD extends View
 
             $this->crumb->addCrumb(
                 $this->getTitle($m),
-                $this->url(['path'=>$this->getPath($path_part)])
+                $this->url(['path' => $this->getPath($path_part)])
             );
 
             $m = $m->ref($p);
-            $path_part[]=$p;
+            $path_part[] = $p;
         }
 
         parent::setModel($m);

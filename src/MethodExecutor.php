@@ -15,33 +15,28 @@ namespace atk4\mastercrud;
  *  - callback, would be executed and return value used.  function() { return 123; }
  *  - array - use a seed for creating model field
  */
-
 class MethodExecutor extends \atk4\ui\View
 {
     use \atk4\core\SessionTrait;
 
     /** @var \atk4\data\Model */
-    public $model = null;
+    public $model;
 
     /** @var string */
-    public $method = null;
+    public $method;
 
     /** @var array */
-    public $defs = null;
+    public $defs;
 
     /**
      * Constructor.
-     *
-     * @param \atk4\data\Model $model
-     * @param string           $method
-     * @param array            $defs
      */
-    public function __construct(\atk4\data\Model $model, $method, $defs = [])
+    public function __construct(\atk4\data\Model $model, string $method, array $defs = [])
     {
         parent::__construct([
             'model' => $model,
             'method' => $method,
-            'defs' => $defs
+            'defs' => $defs,
         ]);
     }
 
@@ -52,12 +47,12 @@ class MethodExecutor extends \atk4\ui\View
     {
         parent::init();
 
-        $this->console = $this->add(['Console', 'event'=>false]);//->addStyle('display', 'none');
+        $this->console = $this->add(['Console', 'event' => false]); //->addStyle('display', 'none');
         $this->console->addStyle('max-height', '50em')->addStyle('overflow', 'scroll');
 
         $this->form = $this->add('Form');
 
-        foreach ($this->defs as $key=>$val) {
+        foreach ($this->defs as $key => $val) {
             if (is_numeric($key)) {
                 $key = 'Argument' . $key;
             }
@@ -76,7 +71,7 @@ class MethodExecutor extends \atk4\ui\View
         $this->form->buttonSave->set('Run');
 
         $this->form->onSubmit(function ($f) {
-            $this->memorize('data', $f->model ? $f->model->get(): []);
+            $this->memorize('data', $f->model ? $f->model->get() : []);
 
             return [$this->console->js()->show(), $this->console->sse];
         });
@@ -85,7 +80,7 @@ class MethodExecutor extends \atk4\ui\View
             $data = $this->recall('data');
             $args = [];
 
-            foreach ($this->defs as $key=>$val) {
+            foreach ($this->defs as $key => $val) {
                 if (is_numeric($key)) {
                     $key = 'Argument' . $key;
                 }
