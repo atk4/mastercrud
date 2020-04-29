@@ -48,7 +48,7 @@ class MethodExecutor extends \atk4\ui\View
     /**
      * Initialization.
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
