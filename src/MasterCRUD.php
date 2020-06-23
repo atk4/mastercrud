@@ -18,7 +18,7 @@ class MasterCRUD extends View
     public $crumb;
 
     /** @var array Default BreadCrumb seed */
-    public $defaultCrumb = [BreadCrumb::class, 'Unspecified', 'big'];
+    public $defaultCrumb = ['Unspecified', 'big'];
 
     /** @var Model the top-most model */
     public $rootModel;
@@ -60,7 +60,7 @@ class MasterCRUD extends View
 
         // add BreadCrumb view
         if (!$this->crumb) {
-            $this->crumb = $this->add($this->defaultCrumb);
+            $this->crumb = BreadCrumb::addTo($this,$this->defaultCrumb);
         }
         $this->add([View::class, 'ui' => 'divider']);
 
@@ -178,13 +178,13 @@ class MasterCRUD extends View
             $caption = $this->model->getRef($ref)->caption ?? $this->getCaption($m);
 
             $this->tabs->addTab($caption, function ($p) use ($subdef, $m, $ref) {
-                $sub_crud = $p->add($this->getCRUDSeed($subdef));
+                $sub_crud = CRUD::addTo($p,$this->getCRUDSeed($subdef));
 
                 $sub_crud->setModel(clone $m);
                 $t = $p->urlTrigger ?: $p->name;
 
                 if (isset($sub_crud->table->columns[$m->title_field])) {
-                    $sub_crud->addDecorator($m->title_field, ['Link', [$t => false, 'path' => $this->getPath($ref)], [$m->table . '_id' => 'id']]);
+                    $sub_crud->addDecorator($m->title_field, [\atk4\ui\TableColumn\Link:class, [$t => false, 'path' => $this->getPath($ref)], [$m->table . '_id' => 'id']]);
                 }
 
                 $this->addActions($sub_crud, $subdef);
@@ -205,11 +205,11 @@ class MasterCRUD extends View
             $view = $this;
         }
 
-        $crud = $view->add($this->getCRUDSeed($defs));
+        $crud = CRUD::addTo($view,$this->getCRUDSeed($defs));
         $crud->setModel($this->model);
 
         if (isset($crud->table->columns[$this->model->title_field])) {
-            $crud->addDecorator($this->model->title_field, ['Link', [], [$this->model->table . '_id' => 'id']]);
+            $crud->addDecorator($this->model->title_field, [\atk4\ui\TableColumn\Link:class, [], [$this->model->table . '_id' => 'id']]);
         }
 
         $this->addActions($crud, $defs);
