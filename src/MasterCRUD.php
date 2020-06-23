@@ -60,7 +60,7 @@ class MasterCRUD extends View
 
         // add BreadCrumb view
         if (!$this->crumb) {
-            $this->crumb = BreadCrumb::addTo($this,$this->defaultCrumb);
+            $this->crumb = BreadCrumb::addTo($this, $this->defaultCrumb);
         }
         $this->add([View::class, 'ui' => 'divider']);
 
@@ -178,7 +178,7 @@ class MasterCRUD extends View
             $caption = $this->model->getRef($ref)->caption ?? $this->getCaption($m);
 
             $this->tabs->addTab($caption, function ($p) use ($subdef, $m, $ref) {
-                $sub_crud = CRUD::addTo($p,$this->getCRUDSeed($subdef));
+                $sub_crud = CRUD::addTo($p, $this->getCRUDSeed($subdef));
 
                 $sub_crud->setModel(clone $m);
                 $t = $p->urlTrigger ?: $p->name;
@@ -205,7 +205,7 @@ class MasterCRUD extends View
             $view = $this;
         }
 
-        $crud = CRUD::addTo($view,$this->getCRUDSeed($defs));
+        $crud = CRUD::addTo($view, $this->getCRUDSeed($defs));
         $crud->setModel($this->model);
 
         if (isset($crud->table->columns[$this->model->title_field])) {
