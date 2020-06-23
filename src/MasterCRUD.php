@@ -39,7 +39,7 @@ class MasterCRUD extends View
     protected $path;
 
     /** @var array Default Crud for all model. You may override this value per model using['_crud'] in setModel */
-    public $defaultCrud = [CRUD::class, 'ipp' => 25];
+    public $defaultCrud = ['ipp' => 25];
 
     /** @var array Default Tabs for all model. You may override this value per model using['_tabs'] in setModel */
     public $defaultTabs = [Tabs::class];
@@ -184,7 +184,7 @@ class MasterCRUD extends View
                 $t = $p->urlTrigger ?: $p->name;
 
                 if (isset($sub_crud->table->columns[$m->title_field])) {
-                    $sub_crud->addDecorator($m->title_field, [\atk4\ui\TableColumn\Link:class, [$t => false, 'path' => $this->getPath($ref)], [$m->table . '_id' => 'id']]);
+                    $sub_crud->addDecorator($m->title_field, [\atk4\ui\TableColumn\Link::class, [$t => false, 'path' => $this->getPath($ref)], [$m->table . '_id' => 'id']]);
                 }
 
                 $this->addActions($sub_crud, $subdef);
