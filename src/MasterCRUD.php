@@ -9,8 +9,10 @@ use atk4\ui\CardTable;
 use atk4\ui\CRUD;
 use atk4\ui\Exception;
 use atk4\ui\jsModal;
+use atk4\ui\TableColumn\Link;
 use atk4\ui\Tabs;
 use atk4\ui\View;
+use atk4\ui\VirtualPage;
 
 class MasterCRUD extends View
 {
@@ -49,8 +51,6 @@ class MasterCRUD extends View
 
     /**
      * Initialization.
-     *
-     * @throws \atk4\core\Exception
      */
     public function init(): void
     {
@@ -91,10 +91,6 @@ class MasterCRUD extends View
      *       ]
      *   ]
      * );
-     *
-     * @throws \atk4\core\Exception
-     * @throws \atk4\data\Exception
-     * @throws \atk4\ui\Exception
      */
     public function setModel(Model $m, array $defs = null): Model
     {
@@ -145,8 +141,6 @@ class MasterCRUD extends View
      * Initialize tabs.
      *
      * @param View $view Parent view
-     *
-     * @throws \atk4\core\Exception
      */
     public function initTabs(array $defs, View $view = null)
     {
@@ -184,7 +178,7 @@ class MasterCRUD extends View
                 $t = $p->urlTrigger ?: $p->name;
 
                 if (isset($sub_crud->table->columns[$m->title_field])) {
-                    $sub_crud->addDecorator($m->title_field, [\atk4\ui\TableColumn\Link::class, [$t => false, 'path' => $this->getPath($ref)], [$m->table . '_id' => 'id']]);
+                    $sub_crud->addDecorator($m->title_field, [Link::class, [$t => false, 'path' => $this->getPath($ref)], [$m->table . '_id' => 'id']]);
                 }
 
                 $this->addActions($sub_crud, $subdef);
@@ -196,8 +190,6 @@ class MasterCRUD extends View
      * Initialize CRUD.
      *
      * @param View $view Parent view
-     *
-     * @throws \atk4\core\Exception
      */
     public function initCrud(array $defs, View $view = null)
     {
@@ -209,7 +201,7 @@ class MasterCRUD extends View
         $crud->setModel($this->model);
 
         if (isset($crud->table->columns[$this->model->title_field])) {
-            $crud->addDecorator($this->model->title_field, [\atk4\ui\TableColumn\Link::class, [], [$this->model->table . '_id' => 'id']]);
+            $crud->addDecorator($this->model->title_field, [Link::class, [], [$this->model->table . '_id' => 'id']]);
         }
 
         $this->addActions($crud, $defs);
@@ -254,8 +246,6 @@ class MasterCRUD extends View
 
     /**
      * Adds CRUD action buttons.
-     *
-     * @throws \atk4\core\Exception
      */
     public function addActions(View $crud, array $defs)
     {
@@ -270,7 +260,7 @@ class MasterCRUD extends View
                 if (is_string($action)) {
                     $crud->menu->addItem($key)->on(
                         'click',
-                        new jsModal('Executing ' . $key, $this->add('VirtualPage')->set(function ($p) use ($key, $action, $crud) {
+                        new jsModal('Executing ' . $key, $this->add([VirtualPage::class])->set(function ($p) use ($key, $action, $crud) {
                             // TODO: this does ont work within a tab :(
                             $p->add(new MethodExecutor($crud->model, $key));
                         }))
@@ -280,7 +270,7 @@ class MasterCRUD extends View
                 if ($action instanceof \Closure) {
                     $crud->menu->addItem($key)->on(
                         'click',
-                        new jsModal('Executing ' . $key, $this->add('VirtualPage')->set(function ($p) use ($key, $action) {
+                        new jsModal('Executing ' . $key, $this->add([VirtualPage::class])->set(function ($p) use ($key, $action) {
                             $action($p, $this->model, $key);
                         }))
                     );
@@ -323,8 +313,6 @@ class MasterCRUD extends View
     /**
      * Return seed for CRUD.
      *
-     * @throws \atk4\core\Exception
-     *
      * @return array|View
      */
     protected function getCRUDSeed(array $defs)
@@ -334,8 +322,6 @@ class MasterCRUD extends View
 
     /**
      * Return seed for Tabs.
-     *
-     * @throws \atk4\core\Exception
      *
      * @return array|View
      */
@@ -347,8 +333,6 @@ class MasterCRUD extends View
     /**
      * Return seed for Card.
      *
-     * @throws \atk4\core\Exception
-     *
      * @return array|View
      */
     protected function getCardSeed(array $defs)
@@ -358,10 +342,6 @@ class MasterCRUD extends View
 
     /**
      * Given a path and arguments, find and load the right model.
-     *
-     * @throws \atk4\core\Exception
-     * @throws \atk4\data\Exception
-     * @throws \atk4\ui\Exception
      */
     public function traverseModel(array $path, array $defs): array
     {
@@ -375,7 +355,9 @@ class MasterCRUD extends View
             }
 
             if (!isset($defs[$p])) {
-                throw new Exception(['Path is not defined', 'path' => $path, 'defs' => $defs]);
+                throw (new Exception('Path is not defined'))
+                    ->addMoreInfo('path', $path)
+                    ->addMoreInfo('defs', $defs);
             }
 
             $defs = $defs[$p];
@@ -385,7 +367,8 @@ class MasterCRUD extends View
             $arg_val = $this->app->stickyGet($arg_name);
 
             if ($arg_val === null) {
-                throw new Exception(['Argument value is not specified', 'arg' => $arg_name]);
+                throw (new Exception('Argument value is not specified'))
+                    ->addMoreInfo('arg', $arg_name);
             }
 
             // load record and traverse
