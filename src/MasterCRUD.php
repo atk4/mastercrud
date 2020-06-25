@@ -9,8 +9,8 @@ use atk4\ui\CardTable;
 use atk4\ui\CRUD;
 use atk4\ui\Exception;
 use atk4\ui\jsModal;
-use atk4\ui\Tabs;
 use atk4\ui\TableColumn\Link;
+use atk4\ui\Tabs;
 use atk4\ui\View;
 use atk4\ui\VirtualPage;
 
