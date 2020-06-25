@@ -2,6 +2,12 @@
 
 namespace atk4\mastercrud;
 
+use atk4\data\Model;
+use atk4\ui\Console;
+use atk4\ui\Form;
+use atk4\ui\FormField\AutoComplete;
+use atk4\ui\View;
+
 /**
  * This component will display a form and a console. After filling out the form, the values
  * will be passed on to the model / method of your choice and the execution of that method
@@ -15,11 +21,11 @@ namespace atk4\mastercrud;
  *  - callback, would be executed and return value used.  function() { return 123; }
  *  - array - use a seed for creating model field
  */
-class MethodExecutor extends \atk4\ui\View
+class MethodExecutor extends View
 {
     use \atk4\core\SessionTrait;
 
-    /** @var \atk4\data\Model */
+    /** @var Model */
     public $model;
 
     /** @var string */
@@ -31,7 +37,7 @@ class MethodExecutor extends \atk4\ui\View
     /**
      * Constructor.
      */
-    public function __construct(\atk4\data\Model $model, string $method, array $defs = [])
+    public function __construct(Model $model, string $method, array $defs = [])
     {
         parent::__construct([
             'model' => $model,
@@ -47,10 +53,10 @@ class MethodExecutor extends \atk4\ui\View
     {
         parent::init();
 
-        $this->console = $this->add(['Console', 'event' => false]); //->addStyle('display', 'none');
+        $this->console = $this->add([Console::class, 'event' => false]); //->addStyle('display', 'none');
         $this->console->addStyle('max-height', '50em')->addStyle('overflow', 'scroll');
 
-        $this->form = $this->add('Form');
+        $this->form = $this->add([Form::class]);
 
         foreach ($this->defs as $key => $val) {
             if (is_numeric($key)) {
@@ -61,8 +67,8 @@ class MethodExecutor extends \atk4\ui\View
                 continue;
             }
 
-            if ($val instanceof \atk4\data\Model) {
-                $this->form->addField($key, ['AutoComplete'])->setModel($val);
+            if ($val instanceof Model) {
+                $this->form->addField($key, [AutoComplete::class])->setModel($val);
             } else {
                 $this->form->addField($key, null, $val);
             }
@@ -87,7 +93,7 @@ class MethodExecutor extends \atk4\ui\View
 
                 if (is_callable($val)) {
                     $val = $val($this->model, $this->method, $data);
-                } elseif ($val instanceof \atk4\data\Model) {
+                } elseif ($val instanceof Model) {
                     $val->load($data[$key]);
                 } else {
                     $val = $data[$key];
