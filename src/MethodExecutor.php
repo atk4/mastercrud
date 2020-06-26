@@ -102,7 +102,7 @@ class MethodExecutor extends View
                 $args[] = $val;
             }
 
-            $c->setModel($this->model, $this->method, $args);
+            $c->runMethod($this->model, $this->method, $args);
         });
     }
 }
