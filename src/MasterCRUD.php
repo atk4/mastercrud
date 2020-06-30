@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace atk4\mastercrud;
 
 use atk4\data\Model;
@@ -9,7 +11,7 @@ use atk4\ui\CardTable;
 use atk4\ui\CRUD;
 use atk4\ui\Exception;
 use atk4\ui\jsModal;
-use atk4\ui\TableColumn\Link;
+use atk4\ui\Table;
 use atk4\ui\Tabs;
 use atk4\ui\View;
 use atk4\ui\VirtualPage;
@@ -178,7 +180,7 @@ class MasterCRUD extends View
                 $t = $p->urlTrigger ?: $p->name;
 
                 if (isset($sub_crud->table->columns[$m->title_field])) {
-                    $sub_crud->addDecorator($m->title_field, [Link::class, [$t => false, 'path' => $this->getPath($ref)], [$m->table . '_id' => 'id']]);
+                    $sub_crud->addDecorator($m->title_field, [Table\Column\Link::class, [$t => false, 'path' => $this->getPath($ref)], [$m->table . '_id' => 'id']]);
                 }
 
                 $this->addActions($sub_crud, $subdef);
@@ -201,7 +203,7 @@ class MasterCRUD extends View
         $crud->setModel($this->model);
 
         if (isset($crud->table->columns[$this->model->title_field])) {
-            $crud->addDecorator($this->model->title_field, [Link::class, [], [$this->model->table . '_id' => 'id']]);
+            $crud->addDecorator($this->model->title_field, [Table\Column\Link::class, [], [$this->model->table . '_id' => 'id']]);
         }
 
         $this->addActions($crud, $defs);
