@@ -5,7 +5,6 @@ namespace atk4\mastercrud;
 use atk4\data\Model;
 use atk4\ui\Console;
 use atk4\ui\Form;
-use atk4\ui\FormField\AutoComplete;
 use atk4\ui\View;
 
 /**
@@ -68,9 +67,9 @@ class MethodExecutor extends View
             }
 
             if ($val instanceof Model) {
-                $this->form->addField($key, [AutoComplete::class])->setModel($val);
+                $this->form->addControl($key, [Form\Control\Lookup::class])->setModel($val);
             } else {
-                $this->form->addField($key, null, $val);
+                $this->form->addControl($key, null, $val);
             }
         }
 

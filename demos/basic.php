@@ -2,9 +2,12 @@
 
 include 'init.php';
 
+use atk4\mastercrud\MasterCRUD;
+use atk4\ui\CRUD;
+
 $app->cdn['atk'] = '../public';
 $mc = $app->add([
-    '\atk4\mastercrud\MasterCRUD',
+    MasterCRUD::class,
     'ipp' => 5,
     'quickSearch' => ['name'],
 ]);
@@ -13,7 +16,7 @@ $mc->setModel(
     [
         'Invoices' => [
             'Lines' => [
-                ['_crud' => ['CRUD', 'displayFields' => ['item', 'total']]],
+                ['_crud' => [CRUD::class, 'displayFields' => ['item', 'total']]],
             ],
             'Allocations' => [],
         ],

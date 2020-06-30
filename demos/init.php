@@ -3,24 +3,29 @@
 require '../vendor/autoload.php';
 require 'db.php';
 
-$app = new \atk4\ui\App('MasterCRUD Demo');
-$app->initLayout('Centered');
+use atk4\data\Model;
+use atk4\ui\App;
+use atk4\ui\Layout;
+use atk4\ui\Message;
+
+$app = new App('MasterCRUD Demo');
+$app->initLayout([Layout\Centered::class]);
 
 // change this as needed
 try {
     $app->dbConnect('pgsql://root:root@localhost/root');
 } catch (\Exception $e) {
-    $app->add(['Message', 'Database is not available', 'error'])->text
+    $app->add([Message::class, 'Database is not available', 'error'])->text
         ->addParagraph('Import file demos/mastercrud.pgsql and see demos/db.php')
         ->addParagraph($e->getMessage());
     exit;
 }
 
-class Client extends \atk4\data\Model
+class Client extends Model
 {
     public $table = 'client';
 
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -32,12 +37,12 @@ class Client extends \atk4\data\Model
     }
 }
 
-class Invoice extends \atk4\data\Model
+class Invoice extends Model
 {
     public $table = 'invoice';
     public $title_field = 'ref_no';
 
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -53,7 +58,7 @@ class Invoice extends \atk4\data\Model
     }
 }
 
-class Line extends \atk4\data\Model
+class Line extends Model
 {
     public $table = 'line';
     public $title_field = 'item';
@@ -71,7 +76,7 @@ class Line extends \atk4\data\Model
     }
 }
 
-class Payment extends \atk4\data\Model
+class Payment extends Model
 {
     public $table = 'payment';
     public $title_field = 'ref_no';
@@ -90,7 +95,7 @@ class Payment extends \atk4\data\Model
     }
 }
 
-class Allocation extends \atk4\data\Model
+class Allocation extends Model
 {
     public $table = 'allocation';
     public $title_field = 'title';
