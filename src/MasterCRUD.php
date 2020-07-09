@@ -101,7 +101,7 @@ class MasterCRUD extends View
         $this->crumb->addCrumb($this->getCaption($m), $this->url());
 
         // extract path
-        $this->path = explode($this->pathDelimiter, $this->app->stickyGet('path'));
+        $this->path = explode($this->pathDelimiter, $this->app->stickyGet('path') ?? '');
         if ($this->path[0] === '') {
             unset($this->path[0]);
         }
