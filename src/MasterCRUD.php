@@ -54,7 +54,7 @@ class MasterCRUD extends View
     /**
      * Initialization.
      */
-    public function init(): void
+    protected function init(): void
     {
         if (in_array($this->pathDelimiter, ['?', '#', '/'], true)) {
             throw new Exception('Can\'t use URL reserved charater (?,#,/) as path delimiter');

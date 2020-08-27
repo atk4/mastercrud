@@ -27,7 +27,7 @@ class Client extends Model
 {
     public $table = 'client';
 
-    public function init(): void
+    protected function init(): void
     {
         parent::init();
 
@@ -44,7 +44,7 @@ class Invoice extends Model
     public $table = 'invoice';
     public $title_field = 'ref_no';
 
-    public function init(): void
+    protected function init(): void
     {
         parent::init();
 
@@ -65,7 +65,7 @@ class Line extends Model
     public $table = 'line';
     public $title_field = 'item';
 
-    public function init()
+    protected function init()
     {
         parent::init();
 
@@ -83,7 +83,7 @@ class Payment extends Model
     public $table = 'payment';
     public $title_field = 'ref_no';
 
-    public function init()
+    protected function init()
     {
         parent::init();
 
@@ -102,7 +102,7 @@ class Allocation extends Model
     public $table = 'allocation';
     public $title_field = 'title';
 
-    public function init()
+    protected function init()
     {
         parent::init();
 
