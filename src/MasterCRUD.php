@@ -180,7 +180,12 @@ class MasterCRUD extends View
                 $t = $p->urlTrigger ?: $p->name;
 
                 if (isset($sub_crud->table->columns[$m->title_field])) {
-                    $sub_crud->addDecorator($m->title_field, [Table\Column\Link::class, [$t => false, 'path' => $this->getPath($ref)], [$m->table . '_id' => 'id']]);
+                    // DEV-Note
+                    // This cause issue since https://github.com/atk4/ui/pull/1397 cause it will always include __atk_callback argument.
+                    // $sub_crud->addDecorator($m->title_field, [Table\Column\Link::class, [$t => false, 'path' => $this->getPath($ref)], [$m->table . '_id' => 'id']]);
+
+                    // Creating url template in order to produce proper url.
+                    $sub_crud->addDecorator($m->title_field, [Table\Column\Link::class, 'url' => $this->app->url(['path' => $this->getPath($ref)]) . '&' . $m->table . '_id=' . '{$id}']);
                 }
 
                 $this->addActions($sub_crud, $subdef);
