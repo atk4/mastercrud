@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace atk4\mastercrud;
 
 use atk4\data\Model;
-use atk4\ui\BreadCrumb;
-use atk4\ui\Card;
+use atk4\ui\Breadcrumb;
 use atk4\ui\CardTable;
 use atk4\ui\CRUD;
 use atk4\ui\Exception;
@@ -18,10 +17,10 @@ use atk4\ui\VirtualPage;
 
 class MasterCRUD extends View
 {
-    /** @var BreadCrumb object */
+    /** @var Breadcrumb object */
     public $crumb;
 
-    /** @var array Default BreadCrumb seed */
+    /** @var array Default Breadcrumb seed */
     public $defaultCrumb = ['Unspecified', 'big'];
 
     /** @var Model the top-most model */
@@ -60,9 +59,9 @@ class MasterCRUD extends View
             throw new Exception('Can\'t use URL reserved charater (?,#,/) as path delimiter');
         }
 
-        // add BreadCrumb view
+        // add Breadcrumb view
         if (!$this->crumb) {
-            $this->crumb = BreadCrumb::addTo($this, $this->defaultCrumb);
+            $this->crumb = Breadcrumb::addTo($this, $this->defaultCrumb);
         }
         $this->add([View::class, 'ui' => 'divider']);
 
