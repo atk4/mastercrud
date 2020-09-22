@@ -7,7 +7,7 @@ namespace atk4\mastercrud;
 use atk4\data\Model;
 use atk4\ui\Breadcrumb;
 use atk4\ui\CardTable;
-use atk4\ui\CRUD;
+use atk4\ui\Crud;
 use atk4\ui\Exception;
 use atk4\ui\jsModal;
 use atk4\ui\Table;
@@ -71,17 +71,17 @@ class MasterCRUD extends View
     /**
      * Sets model.
      *
-     * Use $defs['_crud'] to set seed properties for CRUD view.
+     * Use $defs['_crud'] to set seed properties for Crud view.
      * Use $defs['_tabs'] to set seed properties for Tabs view.
      * Use $defs['_card'] to set seed properties for Card view.
      *
      * For example setting different seeds for Client and Invoice model passing seeds value in array 0.
      * $mc->setModel(new Client($app->db),
      *   [
-     *       ['_crud' => ['CRUD', 'ipp' => 50]],
+     *       ['_crud' => ['Crud', 'ipp' => 50]],
      *       'Invoices'=>[
      *           [
-     *               '_crud' =>['CRUD', 'ipp' => 25, 'displayFields' => ['reference', 'total']],
+     *               '_crud' =>['Crud', 'ipp' => 25, 'displayFields' => ['reference', 'total']],
      *               '_card' =>['Card', 'useLabel' => true]
      *           ],
      *           'Lines'=>[],
@@ -173,7 +173,7 @@ class MasterCRUD extends View
             $caption = $this->model->getRef($ref)->caption ?? $this->getCaption($m);
 
             $this->tabs->addTab($caption, function ($p) use ($subdef, $m, $ref) {
-                $sub_crud = CRUD::addTo($p, $this->getCRUDSeed($subdef));
+                $sub_crud = Crud::addTo($p, $this->getCRUDSeed($subdef));
 
                 $sub_crud->setModel(clone $m);
                 $t = $p->urlTrigger ?: $p->name;
@@ -203,7 +203,7 @@ class MasterCRUD extends View
             $view = $this;
         }
 
-        $crud = CRUD::addTo($view, $this->getCRUDSeed($defs));
+        $crud = Crud::addTo($view, $this->getCRUDSeed($defs));
         $crud->setModel($this->model);
 
         if (isset($crud->table->columns[$this->model->title_field])) {

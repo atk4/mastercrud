@@ -5,7 +5,7 @@ declare(strict_types=1);
 include 'init.php';
 
 use atk4\mastercrud\MasterCRUD;
-use atk4\ui\CRUD;
+use atk4\ui\Crud;
 
 $app->cdn['atk'] = '../public';
 $mc = $app->add([
@@ -18,7 +18,7 @@ $mc->setModel(
     [
         'Invoices' => [
             'Lines' => [
-                ['_crud' => [CRUD::class, 'displayFields' => ['item', 'total']]],
+                ['_crud' => [Crud::class, 'displayFields' => ['item', 'total']]],
             ],
             'Allocations' => [],
         ],
