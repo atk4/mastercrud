@@ -9,7 +9,7 @@ use atk4\ui\Breadcrumb;
 use atk4\ui\CardTable;
 use atk4\ui\Crud;
 use atk4\ui\Exception;
-use atk4\ui\jsModal;
+use atk4\ui\JsModal;
 use atk4\ui\Table;
 use atk4\ui\Tabs;
 use atk4\ui\View;
@@ -266,7 +266,7 @@ class MasterCRUD extends View
                 if (is_string($action)) {
                     $crud->menu->addItem($key)->on(
                         'click',
-                        new jsModal('Executing ' . $key, $this->add([VirtualPage::class])->set(function ($p) use ($key, $action, $crud) {
+                        new JsModal('Executing ' . $key, $this->add([VirtualPage::class])->set(function ($p) use ($key, $action, $crud) {
                             // TODO: this does ont work within a tab :(
                             $p->add(new MethodExecutor($crud->model, $key));
                         }))
@@ -276,7 +276,7 @@ class MasterCRUD extends View
                 if ($action instanceof \Closure) {
                     $crud->menu->addItem($key)->on(
                         'click',
-                        new jsModal('Executing ' . $key, $this->add([VirtualPage::class])->set(function ($p) use ($key, $action) {
+                        new JsModal('Executing ' . $key, $this->add([VirtualPage::class])->set(function ($p) use ($key, $action) {
                             $action($p, $this->model, $key);
                         }))
                     );
