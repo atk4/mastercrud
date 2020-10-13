@@ -27,7 +27,7 @@
   "config": {
     "sort-packages": true
   },
-  "require-release": {
+  "require": {
     "php": ">=7.3.0",
     "atk4/ui": "^2.3"
   },
