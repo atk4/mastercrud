@@ -29,10 +29,6 @@
   },
   "require": {
     "php": ">=7.3.0",
-    "atk4/ui": "dev-develop"
-  },
-  "require-release": {
-    "php": ">=7.3.0",
     "atk4/ui": "~2.3.0"
   },
   "require-dev": {
