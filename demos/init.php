@@ -6,6 +6,7 @@ require '../vendor/autoload.php';
 require 'db.php';
 
 use atk4\data\Model;
+use atk4\data\Persistence;
 use atk4\ui\App;
 use atk4\ui\Layout;
 use atk4\ui\Message;
@@ -15,7 +16,7 @@ $app->initLayout([Layout\Centered::class]);
 
 // change this as needed
 try {
-    $app->dbConnect('pgsql://root:root@localhost/root');
+    $app->db = new Persistence\Sql('pgsql://root:root@localhost/root');
 } catch (\Exception $e) {
     $app->add([Message::class, 'Database is not available', 'error'])->text
         ->addParagraph('Import file demos/mastercrud.pgsql and see demos/db.php')
