@@ -33,7 +33,7 @@
   },
   "require-release": {
     "php": ">=7.3.0",
-    "atk4/ui": "^2.0"
+    "atk4/ui": "~2.3.0"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^2.16",
