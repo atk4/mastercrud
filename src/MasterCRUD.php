@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace atk4\mastercrud;
+namespace Atk4\MasterCrud;
 
-use atk4\data\Model;
-use atk4\ui\Breadcrumb;
-use atk4\ui\CardTable;
-use atk4\ui\Crud;
-use atk4\ui\Exception;
-use atk4\ui\JsModal;
-use atk4\ui\Table;
-use atk4\ui\Tabs;
-use atk4\ui\View;
-use atk4\ui\VirtualPage;
+use Atk4\Data\Model;
+use Atk4\Ui\Breadcrumb;
+use Atk4\Ui\CardTable;
+use Atk4\Ui\Crud;
+use Atk4\Ui\Exception;
+use Atk4\Ui\JsModal;
+use Atk4\Ui\Table;
+use Atk4\Ui\Tabs;
+use Atk4\Ui\View;
+use Atk4\Ui\VirtualPage;
 
 class MasterCRUD extends View
 {
@@ -100,7 +100,7 @@ class MasterCRUD extends View
         $this->crumb->addCrumb($this->getCaption($m), $this->url());
 
         // extract path
-        $this->path = explode($this->pathDelimiter, $this->app->stickyGet('path') ?? '');
+        $this->path = explode($this->pathDelimiter, $this->gteApp()->stickyGet('path') ?? '');
         if ($this->path[0] === '') {
             unset($this->path[0]);
         }
@@ -108,7 +108,7 @@ class MasterCRUD extends View
         $defs = $this->traverseModel($this->path, $defs ?? []);
 
         $arg_name = $this->model->table . '_id';
-        $arg_val = $this->app->stickyGet($arg_name);
+        $arg_val = $this->getApp()->stickyGet($arg_name);
         if ($arg_val && $this->model->tryLoad($arg_val)->loaded()) {
             // initialize Tabs
             $this->initTabs($defs);
@@ -150,7 +150,7 @@ class MasterCRUD extends View
         }
 
         $this->tabs = $view->add($this->getTabsSeed($defs));
-        $this->app->stickyGet($this->model->table . '_id');
+        $this->getApp()->stickyGet($this->model->table . '_id');
 
         $this->crumb->addCrumb($this->getTitle($this->model), $this->tabs->url());
 
@@ -184,7 +184,7 @@ class MasterCRUD extends View
                     // $sub_crud->addDecorator($m->title_field, [Table\Column\Link::class, [$t => false, 'path' => $this->getPath($ref)], [$m->table . '_id' => 'id']]);
 
                     // Creating url template in order to produce proper url.
-                    $sub_crud->addDecorator($m->title_field, [Table\Column\Link::class, 'url' => $this->app->url(['path' => $this->getPath($ref)]) . '&' . $m->table . '_id=' . '{$id}']);
+                    $sub_crud->addDecorator($m->title_field, [Table\Column\Link::class, 'url' => $this->getApp()->url(['path' => $this->getPath($ref)]) . '&' . $m->table . '_id=' . '{$id}']);
                 }
 
                 $this->addActions($sub_crud, $subdef);
@@ -370,7 +370,7 @@ class MasterCRUD extends View
 
             // argument of a current model should be passed if we are traversing
             $arg_name = $m->table . '_id';
-            $arg_val = $this->app->stickyGet($arg_name);
+            $arg_val = $this->getApp()->stickyGet($arg_name);
 
             if ($arg_val === null) {
                 throw (new Exception('Argument value is not specified'))
