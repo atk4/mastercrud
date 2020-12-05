@@ -2,14 +2,16 @@
 
 declare(strict_types=1);
 
+namespace Atk4\MasterCrud\Demo;
+
 require '../vendor/autoload.php';
 require 'db.php';
 
-use atk4\data\Model;
-use atk4\data\Persistence;
-use atk4\ui\App;
-use atk4\ui\Layout;
-use atk4\ui\Message;
+use Atk4\Data\Model;
+use Atk4\Data\Persistence;
+use Atk4\Ui\App;
+use Atk4\Ui\Layout;
+use Atk4\Ui\Message;
 
 $app = new App('MasterCRUD Demo');
 $app->initLayout([Layout\Centered::class]);

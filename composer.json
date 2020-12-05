@@ -42,12 +42,12 @@
   },
   "autoload": {
     "psr-4": {
-      "atk4\\mastercrud\\": "src/"
+      "Atk4\\MasterCrud\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "atk4\\mastercrud\\tests\\": "tests/"
+      "Atk4\\MasterCrud\\Tests\\": "tests/"
     }
   }
 }

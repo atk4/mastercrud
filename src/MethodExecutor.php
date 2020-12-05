@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace atk4\mastercrud;
+namespace Atk4\MasterCrud;
 
-use atk4\data\Model;
-use atk4\ui\Console;
-use atk4\ui\Form;
-use atk4\ui\View;
+use Atk4\Core\SessionTrait;
+use Atk4\Data\Model;
+use Atk4\Ui\Console;
+use Atk4\Ui\Form;
+use Atk4\Ui\View;
 
 /**
  * This component will display a form and a console. After filling out the form, the values
@@ -24,7 +25,7 @@ use atk4\ui\View;
  */
 class MethodExecutor extends View
 {
-    use \atk4\core\SessionTrait;
+    use SessionTrait;
 
     /** @var Model */
     public $model;

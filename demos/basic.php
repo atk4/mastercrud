@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
+namespace Atk4\MasterCrud\Demo;
+
 include 'init.php';
 
-use atk4\mastercrud\MasterCRUD;
-use atk4\ui\Crud;
+use Atk4\MasterCrud\MasterCRUD;
+use Atk4\Ui\Crud;
 
 $app->cdn['atk'] = '../public';
 $mc = $app->add([
