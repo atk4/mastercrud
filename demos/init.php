@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Atk4\MasterCrud\Demo;
 
 require '../vendor/autoload.php';
+
 require 'db.php';
 
 use Atk4\Data\Model;
@@ -23,6 +24,7 @@ try {
     $app->add([Message::class, 'Database is not available', 'error'])->text
         ->addParagraph('Import file demos/mastercrud.pgsql and see demos/db.php')
         ->addParagraph($e->getMessage());
+
     exit;
 }
 

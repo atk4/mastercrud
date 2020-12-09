@@ -266,7 +266,7 @@ class MasterCRUD extends View
                 if (is_string($action)) {
                     $crud->menu->addItem($key)->on(
                         'click',
-                        new JsModal('Executing ' . $key, $this->add([VirtualPage::class])->set(function ($p) use ($key, $action, $crud) {
+                        new JsModal('Executing ' . $key, $this->add([VirtualPage::class])->set(function ($p) use ($key, $crud) {
                             // TODO: this does ont work within a tab :(
                             $p->add(new MethodExecutor($crud->model, $key));
                         }))
@@ -304,7 +304,7 @@ class MasterCRUD extends View
                 }
 
                 if (isset($action[0]) && $action[0] instanceof \Closure) {
-                    $crud->addModalAction($label ?: $key, $key, function ($p, $id) use ($action, $key, $crud) {
+                    $crud->addModalAction($label ?: $key, $key, function ($p, $id) use ($action, $crud) {
                         call_user_func($action[0], $p, $crud->model->load($id));
                     });
                 } else {
