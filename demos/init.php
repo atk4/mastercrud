@@ -39,8 +39,8 @@ class Client extends Model
         $this->addField('name', ['required' => true]);
         $this->addField('address', ['type' => 'text']);
 
-        $this->hasMany('Invoices', new Invoice());
-        $this->hasMany('Payments', new Payment());
+        $this->hasMany('Invoices', ['model' => new Invoice()]);
+        $this->hasMany('Payments', ['model' => new Payment()]);
     }
 }
 
@@ -53,15 +53,15 @@ class Invoice extends Model
     {
         parent::init();
 
-        $this->hasOne('client_id', new Client());
+        $this->hasOne('client_id', ['model' => new Client()]);
 
         $this->addField('ref_no');
         $this->addField('status', ['enum' => ['draft', 'paid', 'partial']]);
 
-        $this->hasMany('Lines', new Line())
+        $this->hasMany('Lines', ['model' => new Line()])
             ->addField('total', ['aggregate' => 'sum']);
 
-        $this->hasMany('Allocations', new Allocation());
+        $this->hasMany('Allocations', ['model' => new Allocation()]);
     }
 }
 
@@ -74,7 +74,7 @@ class Line extends Model
     {
         parent::init();
 
-        $this->hasOne('invoice_id', new Invoice());
+        $this->hasOne('invoice_id', ['model' => new Invoice()]);
         $this->addField('item');
         $this->addField('qty', ['type' => 'integer']);
         $this->addField('price', ['type' => 'money']);
@@ -92,13 +92,13 @@ class Payment extends Model
     {
         parent::init();
 
-        $this->hasOne('client_id', new Client());
+        $this->hasOne('client_id', ['model' => new Client()]);
 
         $this->addField('ref_no');
         $this->addField('status', ['enum' => ['draft', 'allocated', 'partial']]);
         $this->addField('amount', ['type' => 'money']);
 
-        $this->hasMany('Allocations', new Allocation());
+        $this->hasMany('Allocations', ['model' => new Allocation()]);
     }
 }
 
@@ -113,8 +113,8 @@ class Allocation extends Model
 
         $this->addExpression('title', '\'Alloc \' || [id]');
 
-        $this->hasOne('payment_id', new Payment());
-        $this->hasOne('invoice_id', new Invoice());
+        $this->hasOne('payment_id', ['model' => new Payment()]);
+        $this->hasOne('invoice_id', ['model' => new Invoice()]);
         $this->addField('allocated', ['type' => 'money']);
     }
 }
