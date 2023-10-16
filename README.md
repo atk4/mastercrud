@@ -44,35 +44,35 @@ All this UI can be created in just a few lines of code!
 MasterCrud operates like a regular CRUD, and you can easily substitute it in:
 
 ``` php
-$crud = $app->add('\Atk4\MasterCrud\MasterCrud');
+$crud = \Atk4\MasterCrud\MasterCrud::addTo($app);
 $crud->setModel('Client');
 ```
 
 You'll noticed that you can now click on the client name to get full details about this client. Next, we want to be able to see and manage Client invoices:
 
 ``` php
-$crud = $app->add('\Atk4\MasterCrud\MasterCrud');
+$crud = \Atk4\MasterCrud\MasterCrud::addTo($app);
 $crud->setModel('Client', ['Invoices'=>[]]);
 ```
 
 This will add 2nd tab to the "Client Details" screen listing invoices of said client. If you invoice is further broken down into "Lines", you can go one level deeper:
 
 ``` php
-$crud = $app->add('\Atk4\MasterCrud\MasterCrud');
+$crud = \Atk4\MasterCrud\MasterCrud::addTo($app);
 $crud->setModel('Client', ['Invoices'=>['Lines'=>[]]]);
 ```
 
 If `Client hasMany('Payments')` then you can also add that relation:
 
 ``` php
-$crud = $app->add('\Atk4\MasterCrud\MasterCrud');
+$crud = \Atk4\MasterCrud\MasterCrud::addTo($app);
 $crud->setModel('Client', ['Invoices'=>['Lines'=>[]], 'Payments'=>[]]);
 ```
 
 With some cleanup, this syntax is readable and nice:
 
 ``` php
-$crud = $app->add('\Atk4\MasterCrud\MasterCrud');
+$crud = \Atk4\MasterCrud\MasterCrud::addTo($app);
 $crud->setModel('Client', [
   'Invoices'=>[
     'Lines'=>[]
@@ -164,7 +164,7 @@ Also see introduction for [ATK UI](https://github.com/atk4/ui) on how to render 
 Suppose that `Invoice hasMany(Allocation)`and `Payment hasMany(Allocation)` while allocation can have one Payment and one Invoice.
 
 ``` php
-$crud = $app->add('\Atk4\MasterCrud\MasterCrud');
+$crud = \Atk4\MasterCrud\MasterCrud::addTo($app);
 $crud->setModel('Client', [
   'Invoices'=>[
     'Lines'=>[],
@@ -179,7 +179,7 @@ $crud->setModel('Client', [
 That's cool, but if you go through the route of `Invoice -> allocation ->` you should be able to click on the "payment":
 
 ``` php
-$crud = $app->add('\Atk4\MasterCrud\MasterCrud');
+$crud = \Atk4\MasterCrud\MasterCrud::addTo($app);
 $crud->setModel('Client', [
   'Invoices'=>[
     'Lines'=>[],

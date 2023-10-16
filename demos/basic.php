@@ -9,12 +9,7 @@ include 'init.php';
 use Atk4\MasterCrud\MasterCrud;
 use Atk4\Ui\Crud;
 
-$app->cdn['atk'] = '../public';
-$mc = $app->add([
-    MasterCrud::class,
-    'ipp' => 5,
-    'quickSearch' => ['name'],
-]);
+$mc = MasterCrud::addTo($app, ['ipp' => 5, 'quickSearch' => ['name']]);
 $mc->setModel(
     new Client($app->db),
     [
