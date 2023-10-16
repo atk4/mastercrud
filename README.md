@@ -35,49 +35,45 @@ On this screen however we turned off deletion of lines (because it is a demo). H
 
 ![step4](docs/images/step4.png)
 
-
-
 All this UI can be created in just a few lines of code!
-
-
 
 MasterCrud operates like a regular CRUD, and you can easily substitute it in:
 
-``` php
+```php
 $crud = \Atk4\MasterCrud\MasterCrud::addTo($app);
 $crud->setModel('Client');
 ```
 
 You'll noticed that you can now click on the client name to get full details about this client. Next, we want to be able to see and manage Client invoices:
 
-``` php
+```php
 $crud = \Atk4\MasterCrud\MasterCrud::addTo($app);
-$crud->setModel('Client', ['Invoices'=>[]]);
+$crud->setModel('Client', ['Invoices' => []]);
 ```
 
 This will add 2nd tab to the "Client Details" screen listing invoices of said client. If you invoice is further broken down into "Lines", you can go one level deeper:
 
-``` php
+```php
 $crud = \Atk4\MasterCrud\MasterCrud::addTo($app);
-$crud->setModel('Client', ['Invoices'=>['Lines'=>[]]]);
+$crud->setModel('Client', ['Invoices' => ['Lines' => []]]);
 ```
 
 If `Client hasMany('Payments')` then you can also add that relation:
 
-``` php
+```php
 $crud = \Atk4\MasterCrud\MasterCrud::addTo($app);
-$crud->setModel('Client', ['Invoices'=>['Lines'=>[]], 'Payments'=>[]]);
+$crud->setModel('Client', ['Invoices' => ['Lines' => []], 'Payments' => []]);
 ```
 
 With some cleanup, this syntax is readable and nice:
 
-``` php
+```php
 $crud = \Atk4\MasterCrud\MasterCrud::addTo($app);
 $crud->setModel('Client', [
-  'Invoices'=>[
-    'Lines'=>[]
-  ],
-  'Payments'=>[]
+    'Invoices' => [
+        'Lines' => [],
+    ],
+    'Payments' => [],
 ]);
 ```
 
@@ -87,21 +83,21 @@ MasterCrud is awesome for quickly creating admin systems. But basic C,R,U,D oper
 
 ```php
 $app->layout->add(new \Atk4\MasterCrud\MasterCrud())
-    ->setModel(new \saasty\Model\App($app->db),
+    ->setModel(new \Saasty\Model\App($app->db),
     [
-        'columnActions'=>[
-            'repair'=>['icon'=>'wrench'],
+        'columnActions' => [
+            'repair' => ['icon' => 'wrench'],
         ],
-        'Models'=>[
-            'columnActions'=>[
-                'migrate'=>['icon'=>'database'],
+        'Models' => [
+            'columnActions' => [
+                'migrate' => ['icon' => 'database'],
             ],
-            'Fields'=>[
-                'ValidationRules'=>[],
+            'Fields' => [
+                'ValidationRules' => [],
 
             ],
-            'Relations'=>[
-                'ImportedFields'=>[],
+            'Relations' => [
+                'ImportedFields' => [],
             ],
         ],
 ```
@@ -116,15 +112,11 @@ This next example will use form to ask for an email, which will then be passed a
 
 ```php
 [
-    'columnActions'=>[
-         'sendEmail' => ['icon'=>'wrench', 'email'=>'string']
+    'columnActions' => [
+         'sendEmail' => ['icon' => 'wrench', 'email' => 'string'],
    ]
 ]
 ```
-
-
-
-
 
 ### Installation
 
@@ -143,58 +135,42 @@ Also see introduction for [ATK UI](https://github.com/atk4/ui) on how to render 
 - [ ] Create decent "View" mode (relies on ATK UI Card)
 - [ ] Traverse hasOne references (see below)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 -------------------------
 
 > NOT IMPLEMENTED BELOW
 
 Suppose that `Invoice hasMany(Allocation)`and `Payment hasMany(Allocation)` while allocation can have one Payment and one Invoice.
 
-``` php
+```php
 $crud = \Atk4\MasterCrud\MasterCrud::addTo($app);
 $crud->setModel('Client', [
-  'Invoices'=>[
-    'Lines'=>[],
-    'Allocations'=>[]
-  ],
-  'Payments'=>[
-    'Allocations'=>[]
-  ]
+    'Invoices' => [
+        'Lines' => [],
+        'Allocations' => [],
+    ],
+    'Payments' => [
+        'Allocations' => [],
+    ],
 ]);
 ```
 
 That's cool, but if you go through the route of `Invoice -> allocation ->` you should be able to click on the "payment":
 
-``` php
+```php
 $crud = \Atk4\MasterCrud\MasterCrud::addTo($app);
 $crud->setModel('Client', [
-  'Invoices'=>[
-    'Lines'=>[],
-    'Allocations'=>[
-      'payment_id'=>['path'=>'Payments', 'payment_id'=>'payment_id']
-    ]
-  ],
-  'Payments'=>[
-    'Allocations'=>[
-      'invoice_id'=>['path'=>'Invoices', 'invoice_id'=>'invoice_id']
-    ]
-  ]
+    'Invoices' => [
+        'Lines' => [],
+        'Allocations' => [
+            'payment_id' => ['path' => 'Payments', 'payment_id' => 'payment_id'],
+        ],
+    ],
+    'Payments' => [
+        'Allocations' => [
+            'invoice_id' => ['path' => 'Invoices', 'invoice_id' => 'invoice_id'],
+        ],
+    ],
 ]);
 ```
 
 Now you will be able to jump from `Invoice->allocation` to `Payment` and other way around.
-
-
