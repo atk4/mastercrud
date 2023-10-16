@@ -14,7 +14,7 @@ use Atk4\Ui\App;
 use Atk4\Ui\Layout;
 use Atk4\Ui\Message;
 
-$app = new App('MasterCRUD Demo');
+$app = new App('MasterCrud Demo');
 $app->initLayout([Layout\Centered::class]);
 
 // change this as needed

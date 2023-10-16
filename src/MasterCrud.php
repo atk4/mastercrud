@@ -15,7 +15,7 @@ use Atk4\Ui\Tabs;
 use Atk4\Ui\View;
 use Atk4\Ui\VirtualPage;
 
-class MasterCRUD extends View
+class MasterCrud extends View
 {
     /** @var Breadcrumb object */
     public $crumb;
@@ -29,7 +29,7 @@ class MasterCRUD extends View
     /** @var string Tab Label for detail */
     public $detailLabel = 'Details';
 
-    /** @var array of properties which are reserved for MasterCRUD and can't be used as model names */
+    /** @var array of properties which are reserved for MasterCrud and can't be used as model names */
     protected $reserved_properties = ['_crud', '_tabs', '_card', 'caption', 'columnActions', 'menuActions'];
 
     /** @var string Delimiter to generate url path DO NOT USED '?', '#' or '/' */
