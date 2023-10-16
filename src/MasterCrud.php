@@ -9,7 +9,7 @@ use Atk4\Ui\Breadcrumb;
 use Atk4\Ui\CardTable;
 use Atk4\Ui\Crud;
 use Atk4\Ui\Exception;
-use Atk4\Ui\JsModal;
+use Atk4\Ui\Js\JsModal;
 use Atk4\Ui\Table;
 use Atk4\Ui\Tabs;
 use Atk4\Ui\View;
@@ -93,11 +93,11 @@ class MasterCrud extends View
      *   ]
      * );
      */
-    public function setModel(Model $m, array $defs = null): Model
+    public function setModel(Model $model, array $defs = null): void
     {
-        $this->rootModel = $m;
+        $this->rootModel = $model;
 
-        $this->crumb->addCrumb($this->getCaption($m), $this->url());
+        $this->crumb->addCrumb($this->getCaption($model), $this->url());
 
         // extract path
         $this->path = explode($this->pathDelimiter, $this->getApp()->stickyGet('path') ?? '');
@@ -118,8 +118,6 @@ class MasterCrud extends View
         }
 
         $this->crumb->popTitle();
-
-        return $this->rootModel;
     }
 
     /**
