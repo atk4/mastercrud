@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Atk4\MasterCrud;
 
-use Atk4\Core\SessionTrait;
 use Atk4\Data\Model;
 use Atk4\Ui\Console;
 use Atk4\Ui\Form;
+use Atk4\Ui\SessionTrait;
 use Atk4\Ui\View;
 
 /**
@@ -26,9 +26,6 @@ use Atk4\Ui\View;
 class MethodExecutor extends View
 {
     use SessionTrait;
-
-    /** @var Model */
-    public $model;
 
     /** @var string */
     public $method;
@@ -55,7 +52,7 @@ class MethodExecutor extends View
     {
         parent::init();
 
-        $this->console = $this->add([Console::class, 'event' => false]); //->addStyle('display', 'none');
+        $this->console = $this->add([Console::class, 'event' => false]); // ->addStyle('display', 'none');
         $this->console->addStyle('max-height', '50em')->addStyle('overflow', 'scroll');
 
         $this->form = $this->add([Form::class]);

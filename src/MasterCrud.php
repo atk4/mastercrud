@@ -9,7 +9,7 @@ use Atk4\Ui\Breadcrumb;
 use Atk4\Ui\CardTable;
 use Atk4\Ui\Crud;
 use Atk4\Ui\Exception;
-use Atk4\Ui\JsModal;
+use Atk4\Ui\Js\JsModal;
 use Atk4\Ui\Table;
 use Atk4\Ui\Tabs;
 use Atk4\Ui\View;
@@ -93,11 +93,11 @@ class MasterCrud extends View
      *   ]
      * );
      */
-    public function setModel(Model $m, array $defs = null): Model
+    public function setModel(Model $model, array $defs = null): void
     {
-        $this->rootModel = $m;
+        $this->rootModel = $model;
 
-        $this->crumb->addCrumb($this->getCaption($m), $this->url());
+        $this->crumb->addCrumb($this->getCaption($model), $this->url());
 
         // extract path
         $this->path = explode($this->pathDelimiter, $this->getApp()->stickyGet('path') ?? '');
@@ -118,8 +118,6 @@ class MasterCrud extends View
         }
 
         $this->crumb->popTitle();
-
-        return $this->rootModel;
     }
 
     /**
@@ -184,7 +182,7 @@ class MasterCrud extends View
                     // $sub_crud->addDecorator($m->title_field, [Table\Column\Link::class, [$t => false, 'path' => $this->getPath($ref)], [$m->table . '_id' => 'id']]);
 
                     // Creating url template in order to produce proper url.
-                    $sub_crud->addDecorator($m->title_field, [Table\Column\Link::class, 'url' => $this->getApp()->url(['path' => $this->getPath($ref)]) . '&' . $m->table . '_id=' . '{$id}']);
+                    $sub_crud->addDecorator($m->title_field, [Table\Column\Link::class, 'url' => $this->getApp()->url(['path' => $this->getPath($ref)]) . '&' . $m->table . '_id={$id}']);
                 }
 
                 $this->addActions($sub_crud, $subdef);
@@ -266,7 +264,7 @@ class MasterCrud extends View
                 if (is_string($action)) {
                     $crud->menu->addItem($key)->on(
                         'click',
-                        new JsModal('Executing ' . $key, $this->add([VirtualPage::class])->set(function ($p) use ($key, $crud) {
+                        new JsModal('Executing ' . $key, $this->add([VirtualPage::class])->set(static function ($p) use ($key, $crud) {
                             // TODO: this does ont work within a tab :(
                             $p->add(new MethodExecutor($crud->model, $key));
                         }))
@@ -305,10 +303,12 @@ class MasterCrud extends View
 
                 if (isset($action[0]) && $action[0] instanceof \Closure) {
                     $crud->addModalAction($label ?: $key, $key, function ($p, $id) use ($action, $crud) {
+                        $this->issetApp(); // prevent PHP CS Fixer to make this anonymous function static
+
                         call_user_func($action[0], $p, $crud->model->load($id));
                     });
                 } else {
-                    $crud->addModalAction($label ?: $key, $key, function ($p, $id) use ($action, $key, $crud) {
+                    $crud->addModalAction($label ?: $key, $key, static function ($p, $id) use ($action, $key, $crud) {
                         $p->add(new MethodExecutor($crud->model->load($id), $key, $action));
                     });
                 }

@@ -70,7 +70,7 @@ class Line extends Model
     public $table = 'line';
     public $title_field = 'item';
 
-    protected function init()
+    protected function init(): void
     {
         parent::init();
 
@@ -88,7 +88,7 @@ class Payment extends Model
     public $table = 'payment';
     public $title_field = 'ref_no';
 
-    protected function init()
+    protected function init(): void
     {
         parent::init();
 
@@ -107,7 +107,7 @@ class Allocation extends Model
     public $table = 'allocation';
     public $title_field = 'title';
 
-    protected function init()
+    protected function init(): void
     {
         parent::init();
 

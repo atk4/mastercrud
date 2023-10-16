@@ -1,0 +1,18 @@
+includes:
+    - phar://phpstan.phar/conf/bleedingEdge.neon
+
+parameters:
+    level: 6
+    paths:
+        - .
+    excludePaths:
+        - vendor
+
+    ignoreErrors:
+        - '~^(Property .+ has|Method .+\(\) (has parameter \$.+ with|return type has)) no value type specified in iterable type .+\.~'
+
+        # relax strict rules
+        - '~^Only booleans are allowed in .+, .+ given( on the (left|right) side)?\.~'
+
+        # TODO
+        - '~no type specified~'
