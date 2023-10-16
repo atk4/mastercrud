@@ -6,12 +6,12 @@ namespace Atk4\MasterCrud\Demo;
 
 include 'init.php';
 
-use Atk4\MasterCrud\MasterCRUD;
+use Atk4\MasterCrud\MasterCrud;
 use Atk4\Ui\Crud;
 
 $app->cdn['atk'] = '../public';
 $mc = $app->add([
-    MasterCRUD::class,
+    MasterCrud::class,
     'ipp' => 5,
     'quickSearch' => ['name'],
 ]);
